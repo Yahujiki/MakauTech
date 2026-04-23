@@ -1,0 +1,20 @@
+﻿@model MakauTech.Models.RegisterViewModel
+@{
+    ViewData["Title"] = "Register";
+}
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header"><h1>🌟 Join MakauTech</h1><p>Start exploring Sibu and earning rewards</p></div>
+        @if (ViewBag.Error != null)
+        {
+            <div class="alert alert-error">⚠️ @ViewBag.Error</div>
+        }
+        <form method="post" asp-action="Register">
+            <div class="form-group"><label>Name</label><input type="text" name="Name" class="form-control" placeholder="Your full name" required /></div>
+            <div class="form-group"><label>Email</label><input type="email" name="Email" class="form-control" placeholder="your@email.com" required /></div>
+            <div class="form-group"><label>Password</label><input type="password" name="Password" class="form-control" placeholder="Choose a password" required /></div>
+            <button type="submit" class="btn-primary btn-full">Create Account</button>
+        </form>
+        <div class="auth-footer"><p>Already have an account? <a asp-action="Login">Login here</a></p></div>
+    </div>
+</div>

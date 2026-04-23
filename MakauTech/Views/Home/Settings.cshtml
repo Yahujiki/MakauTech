@@ -1,0 +1,377 @@
+@model MakauTech.Models.User
+@{
+    ViewData["Title"] = "Settings";
+    var avatarSrc = ViewBag.AvatarUrl as string;
+    var userName = Model?.Name ?? "Player";
+    var userLevel = Model?.Level ?? "Newbie";
+    var userPoints = Model?.Points ?? 0;
+    var userBadges = Model?.Badges ?? new List<string>();
+    var userPlaces = Model?.VisitedPlaceIds?.Count ?? 0;
+
+    int nextThreshold = userLevel switch {
+        "Newbie" => 20,
+        "Bronze" => 50,
+        "Silver" => 100,
+        _ => 0
+    };
+    int prevThreshold = userLevel switch {
+        "Bronze" => 20,
+        "Silver" => 50,
+        "Gold" => 100,
+        _ => 0
+    };
+    int xpPercent = nextThreshold > 0
+        ? (int)Math.Min(((double)(userPoints - prevThreshold) / (nextThreshold - prevThreshold)) * 100, 100)
+        : 100;
+    string nextLevelName = userLevel switch {
+        "Newbie" => "Bronze",
+        "Bronze" => "Silver",
+        "Silver" => "Gold",
+        _ => "MAX"
+    };
+    string rankColor = userLevel switch {
+        "Gold" => "#f59e0b",
+        "Silver" => "#94a3b8",
+        "Bronze" => "#cd7f32",
+        _ => "#4ade80"
+    };
+    string rankEmoji = userLevel switch {
+        "Gold" => "👑",
+        "Silver" => "🥈",
+        "Bronze" => "🥉",
+        _ => "🌱"
+    };
+}
+
+<div class="gs-page">
+
+    <!-- ══════════ HERO ══════════ -->
+    <div class="gs-hero">
+        <div class="gs-hero-orb gs-hero-orb-1"></div>
+        <div class="gs-hero-orb gs-hero-orb-2"></div>
+        <div class="gs-hero-orb gs-hero-orb-3"></div>
+        <span class="gs-hero-kicker">⚙️ COMMAND CENTER</span>
+        <h1>Settings</h1>
+        <p>Manage your profile, customize your experience, and configure preferences.</p>
+    </div>
+
+    <!-- Flash Messages -->
+    @if (TempData["SettingsSuccess"] != null)
+    {
+        <div class="gs-flash gs-flash--ok">✅ @TempData["SettingsSuccess"]</div>
+    }
+    @if (TempData["SettingsError"] != null)
+    {
+        <div class="gs-flash gs-flash--err">❌ @TempData["SettingsError"]</div>
+    }
+
+    <!-- ══════════ PLAYER CARD ══════════ -->
+    <section class="gs-player-card">
+        <div class="gs-player-left">
+            <div class="gs-player-avatar-wrap">
+                <div class="gs-avatar-ring gs-avatar-ring--lg">
+                    @if (!string.IsNullOrEmpty(avatarSrc))
+                    {
+                        <img src="@Url.Content(avatarSrc)" alt="Avatar" class="gs-avatar-img" />
+                    }
+                    else
+                    {
+                        <div class="gs-avatar-placeholder">👤</div>
+                    }
+                </div>
+                <div class="gs-player-rank-badge" style="background: @rankColor;">@rankEmoji @userLevel</div>
+            </div>
+        </div>
+        <div class="gs-player-right">
+            <h2 class="gs-player-name">@userName</h2>
+            <span class="gs-player-email">@Model?.Email</span>
+            <div class="gs-player-xp">
+                <div class="gs-player-xp-header">
+                    <span class="gs-player-xp-label">@(nextThreshold > 0 ? $"Progress to {nextLevelName}" : "MAX RANK ACHIEVED")</span>
+                    <span class="gs-player-xp-val">@userPoints pts</span>
+                </div>
+                <div class="gs-xp-bar">
+                    <div class="gs-xp-fill" style="width: @xpPercent%;"></div>
+                </div>
+                @if (nextThreshold > 0)
+                {
+                    <span class="gs-xp-hint">@(nextThreshold - userPoints) pts to @nextLevelName</span>
+                }
+            </div>
+            <div class="gs-player-stats">
+                <div class="gs-player-stat">
+                    <span class="gs-player-stat-val">@userPoints</span>
+                    <span class="gs-player-stat-lbl">Total XP</span>
+                </div>
+                <div class="gs-player-stat">
+                    <span class="gs-player-stat-val">@userPlaces</span>
+                    <span class="gs-player-stat-lbl">Places</span>
+                </div>
+                <div class="gs-player-stat">
+                    <span class="gs-player-stat-val">@userBadges.Count</span>
+                    <span class="gs-player-stat-lbl">Badges</span>
+                </div>
+                <div class="gs-player-stat">
+                    <span class="gs-player-stat-val" style="color: @rankColor;">@userLevel</span>
+                    <span class="gs-player-stat-lbl">Rank</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ══════════ SIBU HIGHLIGHTS ══════════ -->
+    <div class="gs-section-divider">
+        <span class="gs-section-divider-icon">📰</span>
+        <span class="gs-section-divider-text">SIBU HIGHLIGHTS</span>
+        <span class="gs-section-divider-line"></span>
+    </div>
+
+    <div class="gs-news-grid">
+        <div class="gs-news-card gs-news-card--featured">
+            <div class="gs-news-badge">🔥 Trending</div>
+            <h3>Sibu Central Market</h3>
+            <p>Malaysia's largest indoor market with 1,100+ stalls — fresh produce, handicrafts, and legendary Foochow street food every morning.</p>
+            <span class="gs-news-tag">🛒 Must Visit</span>
+        </div>
+        <div class="gs-news-card">
+            <div class="gs-news-badge">🆕 New Place</div>
+            <h3>Masjid Al-Qadim</h3>
+            <p>One of Sibu's oldest mosques, a symbol of the town's multicultural heritage. Recently added to MakauTech!</p>
+            <span class="gs-news-tag">🕌 Heritage</span>
+        </div>
+        <div class="gs-news-card">
+            <div class="gs-news-badge">🌙 Night Life</div>
+            <h3>Sibu Night Market</h3>
+            <p>Come alive every evening — satay, fried noodles, fresh juices, and the electric buzz of Sibu after dark.</p>
+            <span class="gs-news-tag">🍜 Food</span>
+        </div>
+        <div class="gs-news-card">
+            <div class="gs-news-badge">⛪ Cultural</div>
+            <h3>Sacred Heart Cathedral</h3>
+            <p>Stunning stained-glass windows and soaring arches — Sibu's principal Catholic church reflects deep interfaith harmony.</p>
+            <span class="gs-news-tag">🏛️ Heritage</span>
+        </div>
+    </div>
+
+    <!-- ══════════ SECTION: PROFILE & IDENTITY ══════════ -->
+    <div class="gs-section-divider">
+        <span class="gs-section-divider-icon">🛡️</span>
+        <span class="gs-section-divider-text">PROFILE &amp; IDENTITY</span>
+        <span class="gs-section-divider-line"></span>
+    </div>
+
+    <div class="gs-grid">
+        <!-- Account Panel -->
+        <section class="gs-panel">
+            <div class="gs-panel-head">
+                <span class="gs-panel-icon">👤</span>
+                <div>
+                    <h2>Account</h2>
+                    <p>Update your display name and email address.</p>
+                </div>
+            </div>
+            <form method="post" asp-action="Settings" class="gs-form">
+                <div class="gs-field">
+                    <label for="gs-name" class="gs-label">Display Name</label>
+                    <input id="gs-name" type="text" name="name" value="@Model?.Name" class="gs-input" required />
+                </div>
+                <div class="gs-field">
+                    <label for="gs-email" class="gs-label">Email Address</label>
+                    <input id="gs-email" type="email" name="email" value="@Model?.Email" class="gs-input" required />
+                </div>
+                <button type="submit" class="gs-btn gs-btn--glow gs-btn--wide">💾 Save Changes</button>
+            </form>
+        </section>
+
+        <!-- Avatar Panel -->
+        <section class="gs-panel">
+            <div class="gs-panel-head">
+                <span class="gs-panel-icon">🖼️</span>
+                <div>
+                    <h2>Profile Picture</h2>
+                    <p>Your avatar appears on leaderboards and profiles.</p>
+                </div>
+            </div>
+            <div class="gs-avatar-upload-zone">
+                <div class="gs-avatar-ring">
+                    @if (!string.IsNullOrEmpty(avatarSrc))
+                    {
+                        <img src="@Url.Content(avatarSrc)" alt="Avatar" class="gs-avatar-img" />
+                    }
+                    else
+                    {
+                        <div class="gs-avatar-placeholder">👤</div>
+                    }
+                </div>
+                <form asp-action="UploadAvatar" method="post" enctype="multipart/form-data" class="gs-avatar-form gs-avatar-form--col">
+                    <input type="file" name="avatar" accept="image/jpeg,image/png,image/webp,image/gif" class="gs-file-hidden" id="gsAvatarInput" required />
+                    <label for="gsAvatarInput" class="gs-btn gs-btn--outline gs-btn--wide">📷 Choose Photo</label>
+                    <button type="submit" class="gs-btn gs-btn--glow gs-btn--wide">⬆️ Upload Avatar</button>
+                    <span class="gs-hint gs-hint--center">JPG, PNG, WebP or GIF · max 2 MB</span>
+                </form>
+            </div>
+        </section>
+    </div>
+
+    <!-- ══════════ SECTION: APPEARANCE ══════════ -->
+    <div class="gs-section-divider">
+        <span class="gs-section-divider-icon">🎨</span>
+        <span class="gs-section-divider-text">APPEARANCE</span>
+        <span class="gs-section-divider-line"></span>
+    </div>
+
+    <div class="gs-grid">
+        <section class="gs-panel">
+            <div class="gs-panel-head">
+                <span class="gs-panel-icon">🎨</span>
+                <div>
+                    <h2>Theme</h2>
+                    <p>Switch between light and dark mode.</p>
+                </div>
+            </div>
+            <div class="gs-toggle-row">
+                <div class="gs-toggle-info">
+                    <span class="gs-toggle-label">🌙 Dark Mode</span>
+                    <span class="gs-toggle-desc">Switch between light and dark themes</span>
+                </div>
+                <label class="gs-switch" id="gsDarkSwitch">
+                    <input type="checkbox" id="gsDarkCheck" />
+                    <span class="gs-switch-track">
+                        <span class="gs-switch-thumb"></span>
+                    </span>
+                </label>
+            </div>
+            <div class="gs-toggle-row">
+                <div class="gs-toggle-info">
+                    <span class="gs-toggle-label">🔊 Game Sounds</span>
+                    <span class="gs-toggle-desc">Enable or disable in-game audio effects</span>
+                </div>
+                <label class="gs-switch">
+                    <input type="checkbox" id="gsSoundCheck" checked />
+                    <span class="gs-switch-track">
+                        <span class="gs-switch-thumb"></span>
+                    </span>
+                </label>
+            </div>
+        </section>
+
+        <!-- Quick Launch Panel -->
+        <section class="gs-panel">
+            <div class="gs-panel-head">
+                <span class="gs-panel-icon">🚀</span>
+                <div>
+                    <h2>Quick Launch</h2>
+                    <p>Jump straight into a game or explore Sibu.</p>
+                </div>
+            </div>
+            <div class="gs-launch-grid">
+                <a asp-controller="Home" asp-action="Games" class="gs-launch-card gs-launch-card--green">
+                    <span class="gs-launch-icon">🎮</span>
+                    <span class="gs-launch-name">Games Hub</span>
+                </a>
+                <a asp-controller="FoodCatch" asp-action="Index" class="gs-launch-card gs-launch-card--pink">
+                    <span class="gs-launch-icon">🍜</span>
+                    <span class="gs-launch-name">Food Catch</span>
+                </a>
+                <a asp-controller="Memory" asp-action="Index" class="gs-launch-card gs-launch-card--blue">
+                    <span class="gs-launch-icon">🧠</span>
+                    <span class="gs-launch-name">Memory Flip</span>
+                </a>
+                <a asp-controller="KitchenRush" asp-action="Index" class="gs-launch-card gs-launch-card--amber">
+                    <span class="gs-launch-icon">🍳</span>
+                    <span class="gs-launch-name">Kitchen Rush</span>
+                </a>
+                <a asp-controller="Sibusprinter" asp-action="Index" class="gs-launch-card gs-launch-card--teal">
+                    <span class="gs-launch-icon">🏃</span>
+                    <span class="gs-launch-name">Sibu Sprint</span>
+                </a>
+                <a asp-controller="Home" asp-action="Explore" class="gs-launch-card gs-launch-card--green">
+                    <span class="gs-launch-icon">📍</span>
+                    <span class="gs-launch-name">Explore</span>
+                </a>
+            </div>
+        </section>
+    </div>
+
+    <!-- ══════════ SECTION: LEGAL ══════════ -->
+    <div class="gs-section-divider">
+        <span class="gs-section-divider-icon">📜</span>
+        <span class="gs-section-divider-text">LEGAL &amp; INFORMATION</span>
+        <span class="gs-section-divider-line"></span>
+    </div>
+
+    <div class="gs-legal-row">
+        <a asp-action="Terms" asp-controller="Home" class="gs-legal-card">
+            <span class="gs-legal-card-icon">📋</span>
+            <span class="gs-legal-card-title">Terms &amp; Conditions</span>
+            <span class="gs-legal-card-arrow">→</span>
+        </a>
+        <a asp-action="Privacy" asp-controller="Home" class="gs-legal-card">
+            <span class="gs-legal-card-icon">🔒</span>
+            <span class="gs-legal-card-title">Privacy Policy</span>
+            <span class="gs-legal-card-arrow">→</span>
+        </a>
+        <a asp-action="About" asp-controller="Home" class="gs-legal-card">
+            <span class="gs-legal-card-icon">ℹ️</span>
+            <span class="gs-legal-card-title">About MakauTech</span>
+            <span class="gs-legal-card-arrow">→</span>
+        </a>
+    </div>
+
+    <!-- Version Footer -->
+    <div class="gs-version">
+        <span class="gs-version-dot"></span>
+        <span>MakauTech 2026</span>
+        <span class="gs-version-sep">·</span>
+        <span>University Technology Sarawak</span>
+    </div>
+
+</div>
+
+@section Scripts {
+<script>
+(function(){
+    var darkCheck = document.getElementById('gsDarkCheck');
+    var html = document.documentElement;
+    var saved = localStorage.getItem('makautech-theme');
+    darkCheck.checked = saved === 'dark';
+
+    darkCheck.addEventListener('change', function(){
+        if (this.checked) {
+            html.setAttribute('data-theme','dark');
+            localStorage.setItem('makautech-theme','dark');
+        } else {
+            html.removeAttribute('data-theme');
+            localStorage.setItem('makautech-theme','light');
+        }
+    });
+
+    var soundCheck = document.getElementById('gsSoundCheck');
+    var soundSaved = localStorage.getItem('makautech-sound');
+    soundCheck.checked = soundSaved !== 'off';
+    soundCheck.addEventListener('change', function(){
+        localStorage.setItem('makautech-sound', this.checked ? 'on' : 'off');
+        if (typeof MakauSound !== 'undefined') MakauSound.enabled = this.checked;
+    });
+
+    // Animate XP bar on load
+    var xpFill = document.querySelector('.gs-xp-fill');
+    if (xpFill) {
+        var target = xpFill.style.width;
+        xpFill.style.width = '0%';
+        setTimeout(function(){ xpFill.style.width = target; }, 300);
+    }
+
+    // Animate stat values on load
+    document.querySelectorAll('.gs-player-stat-val').forEach(function(el, i) {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(10px)';
+        setTimeout(function(){
+            el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+            el.style.opacity = '1';
+            el.style.transform = 'translateY(0)';
+        }, 400 + i * 120);
+    });
+})();
+</script>
+}

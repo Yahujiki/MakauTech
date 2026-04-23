@@ -1,0 +1,46 @@
+# Build
+[Bb]in/
+[Oo]bj/
+[Dd]ebug/
+[Rr]elease/
+*.user
+*.suo
+*.cache
+*.dll
+*.pdb
+*.log
+
+# Visual Studio / Rider
+.vs/
+.idea/
+*.DotSettings.user
+
+# NuGet
+*.nupkg
+**/packages/
+
+# Local databases
+*.db
+*.db-shm
+*.db-wal
+
+# User uploads (avatars, feedback files)
+**/wwwroot/uploads/
+
+# Secrets & local overrides
+appsettings.*.local.json
+secrets.json
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Editor/tooling caches (local only, never commit)
+.cursor/
+.claude/
+.vscode/
+
+# Project docs (kept local)
+*.pdf
+*.docx
+*.xlsx

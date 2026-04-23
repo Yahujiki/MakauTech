@@ -1,0 +1,1025 @@
+﻿@model MakauTech.Models.DashboardViewModel
+@{
+    ViewData["Title"] = "Home";
+    var ph = Url.Content("~/Images/placeholder.svg");
+    bool loggedIn = ViewBag.IsLoggedIn == true;
+}
+
+@if (!loggedIn)
+{
+<style>
+    .landing-hero {
+        position: relative; min-height: 92vh; display: flex; align-items: center;
+        background: linear-gradient(160deg,rgba(5,18,10,0.92) 0%,rgba(9,33,17,0.82) 45%,rgba(12,40,22,0.88) 100%),
+                    url('/Images/Background.jpg') center/cover no-repeat;
+        color: #fff; overflow: hidden; padding: 4rem 2rem;
+    }
+    .landing-hero::after {
+        content:''; position:absolute; inset:0;
+        background: radial-gradient(ellipse 80% 60% at 50% 100%, rgba(34,197,94,0.18) 0%, transparent 65%);
+        pointer-events:none;
+    }
+    .landing-hero-inner { max-width: 860px; margin: 0 auto; position: relative; z-index: 1; text-align: center; }
+    .landing-kicker {
+        display: inline-flex; align-items: center; gap: 0.4rem;
+        background: rgba(34,197,94,0.12); border: 1px solid rgba(34,197,94,0.35);
+        color: #4ade80; font-size: 0.82rem; font-weight: 700; letter-spacing: 0.14em;
+        text-transform: uppercase; padding: 0.35rem 1rem; border-radius: 999px; margin-bottom: 1.25rem;
+    }
+    .landing-h1 {
+        font-size: clamp(2.4rem, 6vw, 4rem); font-weight: 800; line-height: 1.1;
+        margin-bottom: 1.25rem; letter-spacing: -0.02em;
+    }
+    .landing-h1 span { background: linear-gradient(90deg, #4ade80, #22c55e); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .landing-sub { font-size: 1.12rem; opacity: 0.88; max-width: 600px; margin: 0 auto 2rem; line-height: 1.7; }
+    .landing-cta { display: flex; gap: 0.85rem; justify-content: center; flex-wrap: wrap; margin-bottom: 2.5rem; }
+    .landing-btn-main {
+        background: linear-gradient(135deg, #22c55e, #16a34a); color: #fff !important;
+        padding: 1rem 2.5rem; border-radius: 50px; font-size: 1.08rem; font-weight: 800;
+        box-shadow: 0 6px 24px rgba(34,197,94,0.4); transition: all 0.22s; border: none; cursor: pointer;
+    }
+    .landing-btn-main:hover { filter: brightness(1.1); transform: translateY(-3px); box-shadow: 0 10px 32px rgba(34,197,94,0.5); }
+    .landing-btn-ghost {
+        background: rgba(255,255,255,0.08); color: #fff !important; border: 2px solid rgba(255,255,255,0.4);
+        padding: 1rem 2.5rem; border-radius: 50px; font-size: 1.08rem; font-weight: 700;
+        backdrop-filter: blur(4px); transition: all 0.22s;
+    }
+    .landing-btn-ghost:hover { background: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.7); transform: translateY(-2px); }
+    .landing-stats { display: flex; justify-content: center; gap: 2.5rem; flex-wrap: wrap; }
+    .landing-stat { text-align: center; }
+    .landing-stat-num { font-size: 2.2rem; font-weight: 800; color: #4ade80; display: block; line-height: 1; }
+    .landing-stat-lbl { font-size: 0.82rem; opacity: 0.75; text-transform: uppercase; letter-spacing: 0.08em; margin-top: 0.25rem; }
+
+    .why-sibu { padding: 5rem 1.5rem; background: #fff; }
+    .why-sibu-inner { max-width: 1100px; margin: 0 auto; }
+    .section-eyebrow { font-size: 0.78rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: #22c55e; margin-bottom: 0.6rem; display: block; }
+    .why-title { font-size: clamp(1.8rem,4vw,2.6rem); font-weight: 800; color: #071d0f; margin-bottom: 0.75rem; letter-spacing: -0.02em; }
+    .why-sub { color: #4b5563; font-size: 1.05rem; max-width: 560px; margin-bottom: 3rem; line-height: 1.7; }
+    .why-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(240px,1fr)); gap: 1.75rem; }
+    .why-card {
+        border-radius: 18px; padding: 2rem 1.75rem; transition: transform 0.22s, box-shadow 0.22s;
+        position: relative; overflow: hidden;
+    }
+    .why-card:hover { transform: translateY(-6px); box-shadow: 0 12px 36px rgba(0,0,0,0.12); }
+    .why-card--nature  { background: linear-gradient(135deg,#ecfdf5,#d1fae5); border: 1.5px solid #6ee7b7; }
+    .why-card--heritage{ background: linear-gradient(135deg,#fffbeb,#fef3c7); border: 1.5px solid #fcd34d; }
+    .why-card--food    { background: linear-gradient(135deg,#fff1f2,#ffe4e6); border: 1.5px solid #fda4af; }
+    .why-card--adventure{ background: linear-gradient(135deg,#eff6ff,#dbeafe); border: 1.5px solid #93c5fd; }
+    .why-card-icon { font-size: 2.75rem; margin-bottom: 1rem; display: block; }
+    .why-card h3 { font-size: 1.15rem; font-weight: 800; color: #071d0f; margin-bottom: 0.5rem; }
+    .why-card p { font-size: 0.9rem; color: #4b5563; line-height: 1.65; margin-bottom: 1rem; }
+    .why-card-badge { display: inline-block; font-size: 0.78rem; font-weight: 700; padding: 0.3rem 0.85rem; border-radius: 999px; }
+    .why-card--nature  .why-card-badge { background: rgba(16,185,129,0.15); color: #065f46; }
+    .why-card--heritage .why-card-badge { background: rgba(245,158,11,0.15); color: #92400e; }
+    .why-card--food     .why-card-badge { background: rgba(244,63,94,0.15); color: #9f1239; }
+    .why-card--adventure .why-card-badge { background: rgba(59,130,246,0.15); color: #1e40af; }
+
+    .preview-section { padding: 4.5rem 1.5rem; background: linear-gradient(180deg,#f0fdf4 0%,#f8fafc 100%); }
+    .preview-inner { max-width: 1100px; margin: 0 auto; }
+    .preview-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(300px,1fr)); gap: 1.75rem; margin-top: 2rem; }
+    .preview-card {
+        background: #fff; border-radius: 18px; overflow: hidden;
+        box-shadow: 0 4px 20px rgba(7,29,15,0.1); position: relative;
+        transition: transform 0.22s, box-shadow 0.22s; border: 1.5px solid rgba(34,197,94,0.1);
+    }
+    .preview-card:hover { transform: translateY(-5px); box-shadow: 0 12px 38px rgba(7,29,15,0.15); }
+    .preview-img { height: 200px; overflow: hidden; position: relative; }
+    .preview-img img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.35s; }
+    .preview-card:hover .preview-img img { transform: scale(1.06); }
+    .preview-img::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, rgba(7,29,15,0.5) 0%, transparent 55%); }
+    .preview-cat { position: absolute; top: 0.7rem; right: 0.7rem; background: rgba(7,29,15,0.82); color: #fff; font-size: 0.78rem; font-weight: 700; padding: 0.25rem 0.7rem; border-radius: 20px; border: 1px solid rgba(34,197,94,0.35); backdrop-filter: blur(4px); z-index: 2; }
+    .preview-body { padding: 1.25rem; }
+    .preview-body h3 { font-size: 1.05rem; font-weight: 800; color: #071d0f; margin-bottom: 0.35rem; }
+    .preview-body p { font-size: 0.88rem; color: #4b5563; line-height: 1.6; margin-bottom: 0.85rem; }
+    .preview-lock {
+        display: flex; align-items: center; gap: 0.4rem; background: #f0fdf4;
+        border: 1.5px solid #bbf7d0; border-radius: 10px; padding: 0.55rem 0.85rem;
+        font-size: 0.82rem; font-weight: 700; color: #166534;
+    }
+
+    .how-section { padding: 5rem 1.5rem; background: #fff; }
+    .how-inner { max-width: 960px; margin: 0 auto; }
+    .how-steps { display: grid; grid-template-columns: repeat(auto-fill,minmax(220px,1fr)); gap: 2rem; margin-top: 2.5rem; counter-reset: steps; }
+    .how-step { text-align: center; position: relative; }
+    .how-step::before { counter-increment: steps; content: counter(steps); display: flex; align-items: center; justify-content: center; width: 52px; height: 52px; border-radius: 50%; background: linear-gradient(135deg,#22c55e,#16a34a); color: #fff; font-size: 1.3rem; font-weight: 800; margin: 0 auto 1rem; box-shadow: 0 6px 20px rgba(34,197,94,0.35); }
+    .how-step-icon { font-size: 2rem; margin-bottom: 0.75rem; display: block; }
+    .how-step h4 { font-size: 1rem; font-weight: 800; color: #071d0f; margin-bottom: 0.4rem; }
+    .how-step p { font-size: 0.88rem; color: #4b5563; line-height: 1.65; }
+
+    .final-cta { background: linear-gradient(135deg,#071d0f 0%,#0d3320 60%,#0b2e18 100%); color:#fff; padding: 5rem 1.5rem; text-align: center; position: relative; overflow: hidden; }
+    .final-cta::before { content:''; position:absolute; inset:0; background: radial-gradient(ellipse 80% 60% at 50% 110%, rgba(34,197,94,0.2) 0%, transparent 65%); pointer-events:none; }
+    .final-cta-inner { max-width: 680px; margin: 0 auto; position: relative; z-index: 1; }
+    .final-cta h2 { font-size: clamp(1.8rem,4vw,2.8rem); font-weight: 800; margin-bottom: 0.75rem; letter-spacing:-0.02em; }
+    .final-cta h2 span { background: linear-gradient(90deg,#4ade80,#22c55e); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+    .final-cta p { opacity: 0.85; font-size: 1.05rem; margin-bottom: 2rem; line-height: 1.7; }
+    @@media(max-width:640px) { .landing-stats{gap:1.5rem;} .why-grid,.how-steps{grid-template-columns:1fr;} .preview-grid{grid-template-columns:1fr;} }
+</style>
+
+<section class="landing-hero">
+    <div class="landing-hero-inner">
+        <p class="landing-kicker anim-fade-down">🌏 Sibu · Sarawak · Malaysia</p>
+        <h1 class="landing-h1 anim-fade-up anim-d1">Discover the <span>hidden gem</span><br>of Borneo</h1>
+        <p class="landing-sub anim-fade-up anim-d2">
+            Sibu is Sarawak's second-largest city, a vibrant river port famous for Foochow food,
+            historic temples, lush nature reserves, and the mighty Rajang River.
+            Explore, play games, and earn rewards every step of the way.
+        </p>
+        <div class="landing-cta anim-fade-up anim-d3">
+            <a asp-controller="Home" asp-action="Register" class="landing-btn-main">🚀 Register Now</a>
+            <a asp-controller="Home" asp-action="Login" class="landing-btn-ghost">Login</a>
+        </div>
+        <div class="landing-stats anim-fade-up anim-d4">
+            <div class="landing-stat"><span class="landing-stat-num">16</span><span class="landing-stat-lbl">Places to discover</span></div>
+            <div class="landing-stat"><span class="landing-stat-num">5</span><span class="landing-stat-lbl">Arcade mini games</span></div>
+            <div class="landing-stat"><span class="landing-stat-num">8</span><span class="landing-stat-lbl">Badges to unlock</span></div>
+            <div class="landing-stat"><span class="landing-stat-num">Free</span><span class="landing-stat-lbl">Cost to join</span></div>
+        </div>
+    </div>
+</section>
+
+<section class="why-sibu">
+    <div class="why-sibu-inner">
+        <span class="section-eyebrow">Why visit Sibu?</span>
+        <h2 class="why-title">A city full of surprises</h2>
+        <p class="why-sub">Whether you're a nature lover, history buff, foodie, or thrill seeker, Sibu has something unforgettable waiting for you.</p>
+        <div class="why-grid">
+            <div class="why-card why-card--nature scroll-reveal">
+                <span class="why-card-icon">🌿</span>
+                <h3>Nature &amp; Wildlife</h3>
+                <p>Trek through Bukit Lima Nature Reserve, cruise the Rajang River, and spot rare Bornean wildlife in their natural habitat.</p>
+                <span class="why-card-badge">2 nature spots</span>
+            </div>
+            <div class="why-card why-card--heritage scroll-reveal">
+                <span class="why-card-icon">🏛️</span>
+                <h3>Rich Heritage</h3>
+                <p>Visit centuries old Tua Pek Kong Temple, the Sibu Heritage Centre, and historic Sungai Merah waterfront.</p>
+                <span class="why-card-badge">3 heritage sites</span>
+            </div>
+            <div class="why-card why-card--food scroll-reveal">
+                <span class="why-card-icon">🍜</span>
+                <h3>Iconic Foochow Food</h3>
+                <p>Taste the legendary Kampua Mee, Kolo Mee, and Kompia buns, dishes you simply cannot find anywhere else in the world.</p>
+                <span class="why-card-badge">3 food experiences</span>
+            </div>
+            <div class="why-card why-card--adventure scroll-reveal">
+                <span class="why-card-icon">🎯</span>
+                <h3>Markets &amp; Adventure</h3>
+                <p>Wander through Sarawak's largest market, hop on a river cruise, and get the real feel of life on the mighty Rajang River.</p>
+                <span class="why-card-badge">2 adventure spots</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+@if (Model.FeaturedPlaces.Any())
+{
+<section class="preview-section">
+    <div class="preview-inner">
+        <span class="section-eyebrow" style="color:#166534;">Places waiting for you</span>
+        <h2 class="why-title" style="color:#071d0f;">Top rated spots in Sibu</h2>
+        <p class="why-sub">Sign up to track your visits, leave reviews, and earn points at every location.</p>
+        <div class="preview-grid">
+        @foreach (var p in Model.FeaturedPlaces)
+        {
+            <div class="preview-card scroll-reveal">
+                <div class="preview-img">
+                    <img src="@PlaceImageUrl.Resolve(Url, p.ImageUrl)" alt="@p.Name" loading="lazy" onerror="this.onerror=null;this.src='@ph'" />
+                    <span class="preview-cat">@p.Category?.Icon @p.Category?.Name</span>
+                </div>
+                <div class="preview-body">
+                    <h3>@p.Name</h3>
+                    <p>@(p.Description?.Length > 90 ? p.Description.Substring(0, 90) + "…" : p.Description)</p>
+                    <div class="preview-lock">🔒 Sign up to visit &amp; earn points</div>
+                </div>
+            </div>
+        }
+        </div>
+        <p style="text-align:center;margin-top:2rem;">
+            <a asp-controller="Home" asp-action="Register" class="landing-btn-main" style="display:inline-block;padding:0.85rem 2rem;font-size:1rem;">
+                See all @(Model.FeaturedPlaces.Count > 0 ? "16" : "") places →
+            </a>
+        </p>
+    </div>
+</section>
+}
+else
+{
+<section class="preview-section">
+    <div class="preview-inner" style="text-align:center;padding:2rem 0;">
+        <span class="section-eyebrow" style="color:#166534;">Places waiting for you</span>
+        <h2 class="why-title" style="color:#071d0f;">16 iconic Sibu locations</h2>
+        <p class="why-sub" style="margin:0 auto 2rem;">From riverside temples to jungle trails, all mapped and ready to explore.</p>
+        <a asp-controller="Home" asp-action="Register" class="landing-btn-main" style="display:inline-block;padding:0.85rem 2rem;font-size:1rem;">🚀 Join to explore all places</a>
+    </div>
+</section>
+}
+
+<section class="how-section">
+    <div class="how-inner" style="text-align:center;">
+        <span class="section-eyebrow">How it works</span>
+        <h2 class="why-title">Earn points. Climb the leaderboard.</h2>
+        <p class="why-sub" style="margin:0 auto 0.5rem;">MakauTech turns sightseeing into a game. Every action earns you points.</p>
+        <div class="how-steps">
+            <div class="how-step scroll-reveal">
+                <span class="how-step-icon">📍</span>
+                <h4>Visit a place</h4>
+                <p>Go to a real Sibu location, click "Mark as visited" to log it. Earn bonus points for first visits.</p>
+            </div>
+            <div class="how-step scroll-reveal">
+                <span class="how-step-icon">✍️</span>
+                <h4>Leave a review</h4>
+                <p>Write a review of any place. Each review earns you points and helps future visitors.</p>
+            </div>
+            <div class="how-step scroll-reveal">
+                <span class="how-step-icon">🎮</span>
+                <h4>Play mini games</h4>
+                <p>Spin &amp; Win, Memory Flip, Kitchen Rush, Sibu Sprint, all tourism themed and earn up to 50 pts each.</p>
+            </div>
+            <div class="how-step scroll-reveal">
+                <span class="how-step-icon">🏆</span>
+                <h4>Unlock badges</h4>
+                <p>Hit milestones to unlock Explorer, Champion, and more. Your score is shown on the global leaderboard.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="final-cta">
+    <div class="final-cta-inner scroll-reveal">
+        <h2>Ready to <span>explore Sibu</span>?</h2>
+        <p>Join other explorers already earning points, unlocking badges, and discovering Sibu's hidden gems. It takes 30 seconds to sign up and it's completely free.</p>
+        <div class="landing-cta">
+            <a asp-controller="Home" asp-action="Register" class="landing-btn-main">🚀 Register</a>
+            <a asp-controller="Home" asp-action="Login" class="landing-btn-ghost">Already have an account</a>
+        </div>
+    </div>
+</section>
+}
+else
+{
+    var pts       = (int)(ViewBag.UserPoints ?? 0);
+    var uname     = ViewBag.UserName as string ?? "Explorer";
+    var lvl       = ViewBag.UserLevel as string ?? "Newbie";
+    int nextMile  = pts < 40 ? 40 : pts < 50 ? 50 : pts < 100 ? 100 : pts < 500 ? 500 : 1000;
+    int pct       = Math.Min(100, nextMile == 0 ? 100 : (int)((double)pts / nextMile * 100));
+    var initial   = uname.Length > 0 ? uname[0].ToString().ToUpper() : "?";
+    var lvlColor  = lvl == "Gold" ? "#f59e0b" : lvl == "Silver" ? "#94a3b8" : lvl == "Bronze" ? "#c2773a" : "#22c55e";
+    var badgeMap  = new Dictionary<string,string> { {"Explorer","🧭"}, {"Food Hunter","🍜"}, {"Active Reviewer","✍️"}, {"Sibu Expert","🌟"}, {"Champion","🏆"} };
+
+<style>
+body { background: #030d06 !important; }
+.main-content { background: #030d06; }
+
+.db-hero {
+    background: linear-gradient(130deg, #071d0f 0%, #0b2e18 55%, #0d3a1e 100%);
+    padding: 2.5rem 2rem; position: relative; overflow: hidden; color: #fff;
+}
+.db-hero::before {
+    content:''; position:absolute; inset:0;
+    background: radial-gradient(ellipse 80% 70% at 110% 50%, rgba(34,197,94,0.18) 0%, transparent 60%),
+                radial-gradient(ellipse 50% 80% at -10% 50%, rgba(34,197,94,0.08) 0%, transparent 55%);
+    pointer-events:none;
+}
+.db-hero::after { content:''; position:absolute; bottom:0; left:0; right:0; height:1px; background:linear-gradient(90deg,transparent,rgba(34,197,94,0.4),transparent); }
+.db-hero-inner { max-width: 960px; margin: 0 auto; display: flex; align-items: center; gap: 2rem; position: relative; z-index: 1; flex-wrap: wrap; }
+.db-avatar {
+    width: 72px; height: 72px; border-radius: 50%; flex-shrink: 0;
+    background: linear-gradient(135deg,#22c55e,#16a34a);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.9rem; font-weight: 800; color: #fff; border: 3px solid rgba(255,255,255,0.25);
+    box-shadow: 0 0 0 4px rgba(34,197,94,0.3), 0 8px 24px rgba(0,0,0,0.3);
+}
+.db-hero-text { flex: 1; min-width: 200px; }
+.db-greeting { font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.12em; opacity: 0.65; margin-bottom: 0.25rem; }
+.db-hero-name { font-size: clamp(1.5rem,3vw,2rem); font-weight: 800; letter-spacing:-0.02em; margin-bottom: 0.5rem; }
+.db-hero-name span { background: linear-gradient(90deg,#4ade80,#22c55e); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+.db-level-badge {
+    display: inline-flex; align-items: center; gap: 0.35rem;
+    padding: 0.3rem 0.9rem; border-radius: 999px; font-size: 0.82rem; font-weight: 700; border: 1.5px solid;
+}
+.db-hero-actions { display: flex; gap: 0.65rem; flex-wrap: wrap; margin-top: 1.25rem; }
+.db-hero-actions a {
+    padding: 0.6rem 1.25rem; border-radius: 10px; font-size: 0.9rem; font-weight: 700;
+    transition: all 0.2s; display: flex; align-items: center; gap: 0.4rem;
+}
+.db-btn-primary { background: linear-gradient(135deg,#22c55e,#16a34a); color:#fff !important; box-shadow: 0 4px 14px rgba(34,197,94,0.4); }
+.db-btn-primary:hover { filter:brightness(1.1); transform:translateY(-2px); }
+.db-btn-ghost { border: 1.5px solid rgba(255,255,255,0.35); color:#fff !important; background: rgba(255,255,255,0.06); backdrop-filter:blur(4px); }
+.db-btn-ghost:hover { border-color:rgba(255,255,255,0.65); background:rgba(255,255,255,0.1); }
+.db-progress-wrap { margin-top: 1.5rem; background: rgba(255,255,255,0.06); border-radius: 12px; padding: 1rem 1.25rem; border: 1px solid rgba(34,197,94,0.15); }
+.db-progress-labels { display: flex; justify-content: space-between; font-size: 0.8rem; opacity: 0.75; margin-bottom: 0.5rem; }
+.db-progress-bar-track { background: rgba(255,255,255,0.12); border-radius: 999px; height: 8px; overflow: hidden; }
+.db-progress-bar-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg,#22c55e,#4ade80); transition: width 1s cubic-bezier(.25,.46,.45,.94); box-shadow: 0 0 8px rgba(34,197,94,0.5); }
+
+.db-wrap { max-width: 960px; margin: 0 auto; padding: 0 1.5rem; }
+
+/* Stats */
+.db-stats { display: grid; grid-template-columns: repeat(4,1fr); gap: 1rem; padding-top: 1.5rem; }
+.db-stat {
+    background: linear-gradient(135deg, rgba(7,29,15,0.85), rgba(3,13,6,0.92));
+    border-radius: 16px; padding: 1.1rem 1rem 1rem;
+    border: 1.5px solid rgba(34,197,94,0.12); box-shadow: 0 3px 14px rgba(0,0,0,0.25);
+    display: flex; flex-direction: column; gap: 0.2rem; transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+}
+.db-stat:hover { transform:translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.35); border-color: rgba(34,197,94,0.3); }
+.db-stat-icon { font-size: 1.4rem; margin-bottom: 0.15rem; }
+.db-stat-num { font-size: 1.7rem; font-weight: 800; line-height: 1; color: #4ade80; }
+.db-stat-lbl { font-size: 0.72rem; color: rgba(255,255,255,0.4); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+
+/* ── Liquid Glass Quick Actions ── */
+@@keyframes lg-shimmer {
+    0%   { transform: translateX(-120%) skewX(-18deg); }
+    100% { transform: translateX(220%)  skewX(-18deg); }
+}
+.db-actions { display: grid; grid-template-columns: repeat(4,1fr); gap: 1rem; padding-top: 1.25rem; }
+.db-action {
+    position: relative; overflow: hidden;
+    display: flex; flex-direction: column; gap: 0.4rem;
+    padding: 1.4rem 1.25rem; border-radius: 22px;
+    text-decoration: none; color: #e6edf3;
+
+    /* Glass base */
+    background: linear-gradient(
+        135deg,
+        rgba(255,255,255,0.13) 0%,
+        rgba(255,255,255,0.06) 40%,
+        rgba(255,255,255,0.10) 100%
+    );
+    backdrop-filter: blur(20px) saturate(1.6);
+    -webkit-backdrop-filter: blur(20px) saturate(1.6);
+
+    /* Layered borders — outer glow + inner specular */
+    border: 1.5px solid rgba(255,255,255,0.22);
+    box-shadow:
+        0 2px 0 0 rgba(255,255,255,0.18) inset,   /* top specular */
+        0 -1px 0 0 rgba(255,255,255,0.06) inset,  /* bottom rim */
+        0 8px 32px rgba(0,0,0,0.35),
+        0 1px 0 rgba(255,255,255,0.08);
+
+    transition: transform 0.3s cubic-bezier(.34,1.36,.64,1),
+                box-shadow 0.28s ease,
+                border-color 0.25s;
+}
+
+/* Colour tint per card — poured into the glass */
+.db-action--explore { background: linear-gradient(135deg,rgba(34,197,94,0.22) 0%,rgba(255,255,255,0.07) 60%,rgba(34,197,94,0.12) 100%); border-color: rgba(74,222,128,0.35); }
+.db-action--games   { background: linear-gradient(135deg,rgba(245,158,11,0.22) 0%,rgba(255,255,255,0.07) 60%,rgba(245,158,11,0.12) 100%); border-color: rgba(251,191,36,0.35); }
+.db-action--map     { background: linear-gradient(135deg,rgba(59,130,246,0.22) 0%,rgba(255,255,255,0.07) 60%,rgba(59,130,246,0.12) 100%); border-color: rgba(147,197,253,0.35); }
+.db-action--board   { background: linear-gradient(135deg,rgba(168,85,247,0.22) 0%,rgba(255,255,255,0.07) 60%,rgba(168,85,247,0.12) 100%); border-color: rgba(216,180,254,0.35); }
+
+/* Specular shine sweep on hover */
+.db-action::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(
+        105deg,
+        transparent 30%,
+        rgba(255,255,255,0.18) 50%,
+        transparent 70%
+    );
+    transform: translateX(-120%) skewX(-18deg);
+    pointer-events: none;
+}
+.db-action:hover::before { animation: lg-shimmer 0.65s ease forwards; }
+
+/* Bottom colour bar */
+.db-action::after {
+    content: ''; position: absolute; bottom: 0; left: 0; right: 0;
+    height: 3px; border-radius: 0 0 22px 22px;
+}
+.db-action--explore::after { background: linear-gradient(90deg,#22c55e,#4ade80); box-shadow: 0 0 10px rgba(34,197,94,0.6); }
+.db-action--games::after   { background: linear-gradient(90deg,#f59e0b,#fbbf24); box-shadow: 0 0 10px rgba(245,158,11,0.6); }
+.db-action--map::after     { background: linear-gradient(90deg,#3b82f6,#60a5fa); box-shadow: 0 0 10px rgba(59,130,246,0.6); }
+.db-action--board::after   { background: linear-gradient(90deg,#a855f7,#c084fc); box-shadow: 0 0 10px rgba(168,85,247,0.6); }
+
+.db-action:hover {
+    transform: translateY(-7px) scale(1.02);
+    box-shadow:
+        0 2px 0 0 rgba(255,255,255,0.22) inset,
+        0 -1px 0 0 rgba(255,255,255,0.08) inset,
+        0 20px 48px rgba(0,0,0,0.45),
+        0 0 0 1px rgba(255,255,255,0.12);
+}
+.db-action:active { transform: translateY(-2px) scale(0.99); transition-duration: 0.1s; }
+
+.db-action-icon { font-size: 2rem; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.3)); }
+.db-action-title { font-size: 1rem; font-weight: 800; color: #fff; text-shadow: 0 1px 4px rgba(0,0,0,0.4); }
+.db-action-desc { font-size: 0.8rem; color: rgba(255,255,255,0.55); line-height: 1.4; }
+
+/* Section headers */
+.db-divider {
+    display: flex; align-items: center; gap: 0.75rem;
+    margin: 2rem 0 1.25rem; padding: 0 0.25rem;
+}
+.db-divider-icon { font-size: 1.1rem; flex-shrink: 0; }
+.db-divider-text { font-size: 0.72rem; font-weight: 800; letter-spacing: 0.16em; color: rgba(74,222,128,0.6); text-transform: uppercase; white-space: nowrap; }
+.db-divider-line { flex: 1; height: 1px; background: linear-gradient(90deg, rgba(34,197,94,0.3), transparent); }
+
+/* Section head */
+.db-section-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 1rem; }
+.db-section-head h2 { font-size: 1.15rem; font-weight: 800; color: #e6edf3; }
+.db-section-head a { font-size: 0.85rem; font-weight: 700; color: #4ade80; }
+
+/* Sibu Overview */
+.db-overview {
+    background: linear-gradient(135deg, rgba(7,29,15,0.85), rgba(3,13,6,0.92));
+    border: 1.5px solid rgba(34,197,94,0.12);
+    border-radius: 20px; padding: 2rem; color: #e6edf3;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.3); position: relative; overflow: hidden;
+}
+.db-overview::before {
+    content: ''; position: absolute; top: 0; right: 0; width: 200px; height: 200px;
+    background: radial-gradient(circle, rgba(34,197,94,0.06) 0%, transparent 70%);
+    pointer-events: none;
+}
+.db-overview h2 { font-size: 1.3rem; font-weight: 800; margin-bottom: 0.75rem; }
+.db-overview h2 span { color: #4ade80; }
+.db-overview p { font-size: 0.9rem; color: rgba(255,255,255,0.6); line-height: 1.8; margin-bottom: 0.75rem; }
+.db-overview-tags { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem; }
+.db-overview-tag {
+    padding: 0.35rem 0.85rem; border-radius: 999px; font-size: 0.78rem; font-weight: 700;
+    background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+    color: rgba(255,255,255,0.6);
+}
+
+/* Attractions grid */
+.db-attract-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1rem; }
+.db-attract {
+    background: linear-gradient(135deg, rgba(7,29,15,0.85), rgba(3,13,6,0.92));
+    border: 1.5px solid rgba(34,197,94,0.1); border-radius: 18px;
+    color: #e6edf3; overflow: hidden;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+    transition: border-color 0.25s, transform 0.25s, box-shadow 0.25s;
+}
+.db-attract:hover { border-color: rgba(34,197,94,0.3); transform: translateY(-4px); box-shadow: 0 10px 32px rgba(0,0,0,0.3); }
+.db-attract-thumb { width: 100%; height: 110px; object-fit: cover; display: block; opacity: 0.85; transition: opacity 0.3s, transform 0.4s; }
+.db-attract:hover .db-attract-thumb { opacity: 1; transform: scale(1.04); }
+.db-attract-thumb-wrap { overflow: hidden; position: relative; }
+.db-attract-thumb-wrap::after { content:''; position:absolute; bottom:0; left:0; right:0; height:40%; background:linear-gradient(to top, rgba(3,13,6,0.9), transparent); pointer-events:none; }
+.db-attract-body { padding: 1rem 1.25rem 1.25rem; }
+.db-attract-icon { font-size: 1.6rem; margin-bottom: 0.35rem; display: inline-block; }
+.db-attract h3 { font-size: 0.95rem; font-weight: 800; margin-bottom: 0.35rem; }
+.db-attract p { font-size: 0.8rem; color: rgba(255,255,255,0.45); line-height: 1.6; }
+
+/* Tips grid */
+.db-tips-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1rem; }
+.db-tip {
+    display: flex; gap: 0.75rem; align-items: flex-start;
+    background: linear-gradient(135deg, rgba(7,29,15,0.85), rgba(3,13,6,0.92));
+    border: 1.5px solid rgba(34,197,94,0.1); border-radius: 16px;
+    padding: 1.25rem; color: #e6edf3; box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+    transition: border-color 0.2s;
+}
+.db-tip:hover { border-color: rgba(34,197,94,0.25); }
+.db-tip-icon { font-size: 1.5rem; flex-shrink: 0; margin-top: 0.1rem; }
+.db-tip h4 { font-size: 0.88rem; font-weight: 800; margin-bottom: 0.2rem; }
+.db-tip p { font-size: 0.78rem; color: rgba(255,255,255,0.45); line-height: 1.6; }
+
+/* Place cards dark override */
+.db-places .place-card { background: linear-gradient(135deg, rgba(7,29,15,0.85), rgba(3,13,6,0.92)); border-color: rgba(34,197,94,0.12); }
+.db-places .place-info h3 { color: #e6edf3; }
+.db-places .place-desc, .db-places .place-location { color: rgba(255,255,255,0.45); }
+.db-places .btn-visit { background: linear-gradient(135deg,#22c55e,#16a34a); }
+
+/* Badges dark */
+.db-badges { display: flex; flex-wrap: wrap; gap: 0.65rem; }
+.db-badge {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    padding: 0.4rem 0.9rem; border-radius: 999px; font-size: 0.82rem; font-weight: 700;
+    background: rgba(34,197,94,0.1); color: #4ade80;
+    border: 1.5px solid rgba(34,197,94,0.25); box-shadow: 0 2px 6px rgba(34,197,94,0.1);
+}
+
+/* Leaderboard mini dark */
+.db-leader-list { display: flex; flex-direction: column; gap: 0.6rem; }
+.db-leader-row {
+    display: flex; align-items: center; gap: 0.85rem; padding: 0.7rem 1rem;
+    background: linear-gradient(135deg, rgba(7,29,15,0.85), rgba(3,13,6,0.92));
+    border-radius: 12px; border: 1.5px solid rgba(34,197,94,0.1);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+.db-leader-rank { font-size: 1.2rem; width: 28px; text-align: center; flex-shrink: 0; }
+.db-leader-name { flex: 1; font-weight: 700; font-size: 0.93rem; color: #e6edf3; }
+.db-leader-pts { font-size: 0.85rem; font-weight: 800; color: #4ade80; background: rgba(34,197,94,0.1); padding: 0.2rem 0.7rem; border-radius: 999px; }
+
+/* Two-col layout */
+.db-two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+
+@@media(max-width:960px){
+    .db-attract-grid{grid-template-columns:repeat(2,1fr);}
+}
+@@media(max-width:768px){
+    .db-hero-inner{flex-direction:column;text-align:center;}
+    .db-hero-actions{justify-content:center;}
+    .db-stats,.db-actions{grid-template-columns:repeat(2,1fr);}
+    .db-attract-grid,.db-tips-grid{grid-template-columns:1fr;}
+    .db-two-col{grid-template-columns:1fr;}
+}
+@@media(max-width:480px){
+    .db-stats,.db-actions{grid-template-columns:repeat(2,1fr);}
+    .db-stat{padding:0.75rem 0.5rem;}
+    .db-stat-num{font-size:1.4rem;}
+    .db-hero-name{font-size:1.4rem;}
+    .db-hero-inner{gap:0.75rem;}
+    .db-hero-actions{flex-direction:column;align-items:stretch;}
+    .db-btn-primary,.db-btn-ghost{text-align:center;}
+}
+</style>
+
+    <!-- ══════════ HERO ══════════ -->
+    <div class="db-hero">
+        <div class="db-hero-inner">
+            <div class="db-avatar">@initial</div>
+            <div class="db-hero-text">
+                <p class="db-greeting">Welcome back</p>
+                <h1 class="db-hero-name">Hello, <span>@uname</span> 👋</h1>
+                <span class="db-level-badge" style="color:@lvlColor;border-color:@lvlColor;background:rgba(255,255,255,0.06);">
+                    @(lvl == "Gold" ? "🥇" : lvl == "Silver" ? "🥈" : lvl == "Bronze" ? "🥉" : "🌱") @lvl Explorer
+                </span>
+                <div class="db-hero-actions">
+                    <a asp-controller="Home" asp-action="Explore" class="db-btn-primary">📍 Explore Sibu</a>
+                    <a asp-controller="Home" asp-action="Games" class="db-btn-ghost">🎮 Games</a>
+                    <a asp-controller="Home" asp-action="Map" class="db-btn-ghost">🗺️ Map</a>
+                </div>
+                <div class="db-progress-wrap">
+                    <div class="db-progress-labels">
+                        <span>@pts pts</span>
+                        <span>Next: @nextMile pts (@(nextMile == 1000 ? "Champion" : nextMile == 500 ? "Gold" : nextMile == 100 ? "Silver" : nextMile == 50 ? "Sibu Expert" : "Explorer"))</span>
+                    </div>
+                    <div class="db-progress-bar-track">
+                        <div class="db-progress-bar-fill" id="dbProgressFill" style="width:0%;" data-pct="@pct"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="db-wrap">
+
+    <!-- ══════════ STATS ══════════ -->
+    <div class="db-stats" id="tour-stats">
+        <div class="db-stat"><span class="db-stat-icon">⭐</span><span class="db-stat-num" id="dash-pts-anim" data-val="@pts">0</span><span class="db-stat-lbl">Points earned</span></div>
+        <div class="db-stat"><span class="db-stat-icon">📍</span><span class="db-stat-num">16</span><span class="db-stat-lbl">Places to visit</span></div>
+        <div class="db-stat"><span class="db-stat-icon">🎮</span><span class="db-stat-num">4</span><span class="db-stat-lbl">Mini games</span></div>
+        <div class="db-stat"><span class="db-stat-icon">🏆</span><span class="db-stat-num">10+</span><span class="db-stat-lbl">Badges total</span></div>
+    </div>
+
+    <!-- ══════════ QUICK ACTIONS ══════════ -->
+    <div class="db-actions" id="tour-actions">
+        <a asp-controller="Home" asp-action="Explore" class="db-action db-action--explore" id="tour-explore"><span class="db-action-icon">📍</span><span class="db-action-title">Explore Sibu</span><span class="db-action-desc">Discover landmarks, temples &amp; nature spots</span></a>
+        <a asp-controller="Home" asp-action="Games" class="db-action db-action--games" id="tour-games"><span class="db-action-icon">🎮</span><span class="db-action-title">Play Games</span><span class="db-action-desc">4 tourism mini games, earn up to 50 pts</span></a>
+        <a asp-controller="Home" asp-action="Map" class="db-action db-action--map"><span class="db-action-icon">🗺️</span><span class="db-action-title">Live Map</span><span class="db-action-desc">All Sibu places on an interactive map</span></a>
+        <a asp-controller="Home" asp-action="Leaderboard" class="db-action db-action--board"><span class="db-action-icon">🏆</span><span class="db-action-title">Leaderboard</span><span class="db-action-desc">See where you rank among explorers</span></a>
+    </div>
+
+    <!-- ══════════ DISCOVER SIBU ══════════ -->
+    <div class="db-divider"><span class="db-divider-icon">🌏</span><span class="db-divider-text">DISCOVER SIBU</span><span class="db-divider-line"></span></div>
+
+    <div class="db-overview">
+        <h2>The Gateway to <span>Central Sarawak</span></h2>
+        <p>Sibu is one of the major towns in Sarawak, located along the mighty Rajang River — the longest river in Malaysia. Known as the "Gateway to Central Sarawak," Sibu boasts a rich Chinese heritage, especially from the Fuzhou (Foochow) settlers who arrived in the early 1900s.</p>
+        <p>The town is famous for its vibrant markets, historic Chinese temples, and unique culinary offerings like Kampua Mee and Kompia buns. Sibu's architectural landscape is distinctly shaped by its Foochow community, with many historical shophouses that remain central to the thriving local business scene.</p>
+        <p>Sibu's charm lies in its authentic blend of culture, food, and the bustling energy of its local communities. It's also the gateway to rural longhouses, riverine journeys, and the surrounding rainforest wilderness of Borneo.</p>
+        <div class="db-overview-tags">
+            <span class="db-overview-tag">🏙️ Gateway City</span>
+            <span class="db-overview-tag">🌊 Rajang River</span>
+            <span class="db-overview-tag">🏛️ Foochow Heritage</span>
+            <span class="db-overview-tag">🍜 Iconic Food</span>
+            <span class="db-overview-tag">🌿 Borneo Rainforest</span>
+            <span class="db-overview-tag">🛒 Largest Indoor Market</span>
+        </div>
+    </div>
+
+    <!-- ══════════ MAJOR ATTRACTIONS ══════════ -->
+    <div class="db-divider"><span class="db-divider-icon">🏛️</span><span class="db-divider-text">MAJOR ATTRACTIONS</span><span class="db-divider-line"></span></div>
+
+    <div class="db-attract-grid">
+        <div class="db-attract">
+            <div class="db-attract-thumb-wrap">
+                <img src="@Url.Content("~/Images/central-market.jpg")" alt="Sibu Central Market" class="db-attract-thumb" onerror="this.onerror=null;this.src='@ph'" />
+            </div>
+            <div class="db-attract-body">
+                <span class="db-attract-icon">🛒</span>
+                <h3>Sibu Central Market</h3>
+                <p>Malaysia's largest indoor market with over 1,100 stalls. Experience local produce, exotic fruits, Iban handicrafts, and street food from early morning to late night.</p>
+            </div>
+        </div>
+        <div class="db-attract">
+            <div class="db-attract-thumb-wrap">
+                <img src="@Url.Content("~/Images/rajang-river.jpg")" alt="Rejang Esplanade" class="db-attract-thumb" onerror="this.onerror=null;this.src='@ph'" />
+            </div>
+            <div class="db-attract-body">
+                <span class="db-attract-icon">🌊</span>
+                <h3>Rejang Esplanade</h3>
+                <p>A beautifully landscaped waterfront promenade along the Rajang River, featuring the iconic Swan Statue — the emblem of Sibu — and stunning sunset views.</p>
+            </div>
+        </div>
+        <div class="db-attract">
+            <div class="db-attract-thumb-wrap">
+                <img src="@Url.Content("~/Images/tua-pek-kong.jpg")" alt="Tua Pek Kong Temple" class="db-attract-thumb" onerror="this.onerror=null;this.src='@ph'" />
+            </div>
+            <div class="db-attract-body">
+                <span class="db-attract-icon">⛩️</span>
+                <h3>Tua Pek Kong Temple</h3>
+                <p>One of the oldest Chinese temples in Sibu, offering insight into the town's spiritual and cultural heritage with ornate architecture and rich history.</p>
+            </div>
+        </div>
+        <div class="db-attract">
+            <div class="db-attract-thumb-wrap">
+                <img src="@Url.Content("~/Images/bukit-lima.jpg")" alt="Bukit Aup Jubilee Park" class="db-attract-thumb" onerror="this.onerror=null;this.src='@ph'" />
+            </div>
+            <div class="db-attract-body">
+                <span class="db-attract-icon">🏞️</span>
+                <h3>Bukit Aup Jubilee Park</h3>
+                <p>A 24-acre park with a lookout tower offering panoramic views of plantations, longhouses, and the Igan River. Perfect for nature trails and picnics.</p>
+            </div>
+        </div>
+        <div class="db-attract">
+            <div class="db-attract-thumb-wrap">
+                <img src="@Url.Content("~/Images/kompia.jpg")" alt="Kompia Making" class="db-attract-thumb" onerror="this.onerror=null;this.src='@ph'" />
+            </div>
+            <div class="db-attract-body">
+                <span class="db-attract-icon">🥟</span>
+                <h3>Kompia Making</h3>
+                <p>Sibu's most iconic pastry — a Foochow bun baked fresh in coal ovens. Watch the traditional making process and taste this centuries-old culinary treasure.</p>
+            </div>
+        </div>
+        <div class="db-attract">
+            <div class="db-attract-thumb-wrap">
+                <img src="@Url.Content("~/Images/sungai-merah.jpg")" alt="Sibu Gateway & Swan Garden" class="db-attract-thumb" onerror="this.onerror=null;this.src='@ph'" />
+            </div>
+            <div class="db-attract-body">
+                <span class="db-attract-icon">🦢</span>
+                <h3>Sibu Gateway &amp; Swan Garden</h3>
+                <p>The symbolic gateway features illuminated fountains, an open-air stage, and Lin's Garden with the famous Swan Statue guarded by 12 Chinese zodiac signs.</p>
+            </div>
+        </div>
+        <div class="db-attract">
+            <div class="db-attract-thumb-wrap">
+                <img src="@Url.Content("~/Images/masjid-al-qadim.jpg")" alt="Masjid Al-Qadim" class="db-attract-thumb" onerror="this.onerror=null;this.src='@ph'" />
+            </div>
+            <div class="db-attract-body">
+                <span class="db-attract-icon">🕌</span>
+                <h3>Masjid Al-Qadim</h3>
+                <p>One of the oldest mosques in Sibu, built in the early 20th century by the local Malay and Melanau Muslim community. Features traditional Malay-Islamic architecture with a whitewashed exterior, arched windows, and a classic minaret tower.</p>
+            </div>
+        </div>
+        <div class="db-attract">
+            <div class="db-attract-thumb-wrap">
+                <img src="@Url.Content("~/Images/lau-king-howe.jpg")" alt="Lau King Howe Hospital Memorial Museum" class="db-attract-thumb" onerror="this.onerror=null;this.src='@ph'" />
+            </div>
+            <div class="db-attract-body">
+                <span class="db-attract-icon">🏥</span>
+                <h3>Lau King Howe Memorial Museum</h3>
+                <p>A heritage museum in the grounds of the former Lau King Howe Hospital — one of Sibu's earliest modern medical facilities from the 1930s. Exhibits include vintage medical equipment, wartime documents, and historical photographs.</p>
+            </div>
+        </div>
+        <div class="db-attract">
+            <div class="db-attract-thumb-wrap">
+                <img src="@Url.Content("~/Images/sibu-night-market.jpg")" alt="Sibu Night Market" class="db-attract-thumb" onerror="this.onerror=null;this.src='@ph'" />
+            </div>
+            <div class="db-attract-body">
+                <span class="db-attract-icon">🌙</span>
+                <h3>Sibu Night Market</h3>
+                <p>One of Sibu's most vibrant evening attractions. Rows of brightly lit stalls selling street food, satay, Foochow noodles, tropical juices, and barbecued seafood. The perfect place to experience authentic local life.</p>
+            </div>
+        </div>
+        <div class="db-attract">
+            <div class="db-attract-thumb-wrap">
+                <img src="@Url.Content("~/Images/star-mega-mall.jpg")" alt="Star Mega Mall" class="db-attract-thumb" onerror="this.onerror=null;this.src='@ph'" />
+            </div>
+            <div class="db-attract-body">
+                <span class="db-attract-icon">🛍️</span>
+                <h3>Star Mega Mall</h3>
+                <p>Sibu's largest and most modern shopping complex — featuring retail brands, a cinema, food court, arcade, and indoor playground. A popular hub for families, shoppers, and seasonal events year-round.</p>
+            </div>
+        </div>
+        <div class="db-attract">
+            <div class="db-attract-thumb-wrap">
+                <img src="@Url.Content("~/Images/sibu-lake-garden.jpg")" alt="Sibu Lake Garden" class="db-attract-thumb" onerror="this.onerror=null;this.src='@ph'" />
+            </div>
+            <div class="db-attract-body">
+                <span class="db-attract-icon">🌳</span>
+                <h3>Sibu Lake Garden</h3>
+                <p>A beautifully landscaped park built around a tranquil man-made lake. Features jogging trails, a wooden boardwalk, gazebos, and a children's playground. A green oasis perfect for birdwatching and morning exercise.</p>
+            </div>
+        </div>
+        <div class="db-attract">
+            <div class="db-attract-thumb-wrap">
+                <img src="@Url.Content("~/Images/sacred-heart-cathedral.jpg")" alt="Sacred Heart Cathedral" class="db-attract-thumb" onerror="this.onerror=null;this.src='@ph'" />
+            </div>
+            <div class="db-attract-body">
+                <span class="db-attract-icon">⛪</span>
+                <h3>Sacred Heart Cathedral</h3>
+                <p>The principal Roman Catholic church in Sibu, featuring soaring arched ceilings, stunning stained-glass windows, and a grand altar. A symbol of Sibu's deep interfaith harmony serving Iban, Chinese, and Malay communities.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══════════ FEATURED PLACES ══════════ -->
+    <div class="db-divider"><span class="db-divider-icon">📍</span><span class="db-divider-text">FEATURED PLACES TO VISIT</span><span class="db-divider-line"></span></div>
+
+    <div class="db-section-head">
+        <h2>Top Rated Spots</h2>
+        <a asp-controller="Home" asp-action="Explore">See all →</a>
+    </div>
+    @if (Model.FeaturedPlaces.Any())
+    {
+        <div class="places-grid db-places" style="margin-bottom:0;">
+            @foreach (var place in Model.FeaturedPlaces)
+            {
+                var likeCount = Model.LikeCounts.ContainsKey(place.Id) ? Model.LikeCounts[place.Id] : 0;
+                <div class="place-card">
+                    <div class="place-image-wrap">
+                        <img src="@PlaceImageUrl.Resolve(Url, place.ImageUrl)" alt="@place.Name" loading="lazy" onerror="this.onerror=null;this.src='@ph'" />
+                        <span class="place-category">@place.Category?.Icon @place.Category?.Name</span>
+                    </div>
+                    <div class="place-info">
+                        <h3>@place.Name</h3>
+                        <p class="place-location">📍 @place.Location</p>
+                        <p class="place-desc">@(place.Description?.Length > 100 ? place.Description[..100] + "…" : place.Description ?? "")</p>
+                        <div class="place-meta">
+                            @if (place.Rating > 0) { <span class="place-rating">⭐ @place.Rating.ToString("F1")</span> }
+                            @if (likeCount > 0) { <span class="place-likes">❤️ @likeCount</span> }
+                        </div>
+                        <a asp-controller="Place" asp-action="Detail" asp-route-id="@place.Id" class="btn-visit">View details</a>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <p style="color:rgba(255,255,255,0.4);padding:1.5rem 0;">No places loaded yet — <a asp-controller="Home" asp-action="Explore" style="color:#4ade80;font-weight:700;">browse all places →</a></p>
+    }
+
+    <!-- ══════════ LOCAL TIPS ══════════ -->
+    <div class="db-divider"><span class="db-divider-icon">💡</span><span class="db-divider-text">LOCAL TIPS &amp; TRAVEL GUIDE</span><span class="db-divider-line"></span></div>
+
+    <div class="db-tips-grid">
+        <div class="db-tip">
+            <span class="db-tip-icon">🍜</span>
+            <div>
+                <h4>Foochow Food</h4>
+                <p>Don't leave without trying Kampua Mee, Kolo Mee, and Kompia buns. Visit Sibu Central Market early morning for the freshest street food experience.</p>
+            </div>
+        </div>
+        <div class="db-tip">
+            <span class="db-tip-icon">🌤️</span>
+            <div>
+                <h4>Best Time to Visit</h4>
+                <p>Sibu enjoys tropical weather year-round (23°C–31°C). Avoid November to February for lighter rainfall. Humidity is high — stay hydrated!</p>
+            </div>
+        </div>
+        <div class="db-tip">
+            <span class="db-tip-icon">🚢</span>
+            <div>
+                <h4>River Transport</h4>
+                <p>Sibu is well connected by express boats along the Rajang River. Take a scenic river cruise to explore nearby rural towns and Iban longhouses.</p>
+            </div>
+        </div>
+        <div class="db-tip">
+            <span class="db-tip-icon">⛩️</span>
+            <div>
+                <h4>Temple Visits</h4>
+                <p>Sibu has impressive Chinese temples like Tua Pek Kong. Visit for insight into the town's deep spiritual and Foochow cultural heritage.</p>
+            </div>
+        </div>
+        <div class="db-tip">
+            <span class="db-tip-icon">🏨</span>
+            <div>
+                <h4>Accommodation</h4>
+                <p>Hotels range from budget to mid-range. Sibu is a great base for exploring rural areas, longhouses, and the Borneo rainforest nearby.</p>
+            </div>
+        </div>
+        <div class="db-tip">
+            <span class="db-tip-icon">🛒</span>
+            <div>
+                <h4>Market Tips</h4>
+                <p>Sibu Central Market opens at 6 AM. Bring water, arrive early for the best produce, and explore Iban vendors selling exotic jungle fruits and crafts.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══════════ LEADERBOARD + BADGES ══════════ -->
+    <div class="db-divider"><span class="db-divider-icon">🏆</span><span class="db-divider-text">YOUR PROGRESS</span><span class="db-divider-line"></span></div>
+
+    <div class="db-two-col">
+        <div>
+            <div class="db-section-head" style="margin-bottom:0.85rem;"><h2>Top Explorers</h2><a asp-controller="Home" asp-action="Leaderboard">Full board →</a></div>
+            @if (Model.TopThree.Count > 0)
+            {
+                <div class="db-leader-list">
+                    @for (var i = 0; i < Model.TopThree.Count; i++)
+                    {
+                        var u = Model.TopThree[i];
+                        <div class="db-leader-row">
+                            <span class="db-leader-rank">@(i == 0 ? "🥇" : i == 1 ? "🥈" : "🥉")</span>
+                            <span class="db-leader-name">@u.Name</span>
+                            <span class="db-leader-pts">@u.Points pts</span>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <p style="color:rgba(255,255,255,0.4);font-size:0.88rem;">No scores yet — play games to climb!</p>
+            }
+        </div>
+        <div>
+            <div class="db-section-head" style="margin-bottom:0.85rem;"><h2>Badges to Earn</h2><a asp-controller="Home" asp-action="Achievements">All badges →</a></div>
+            <div class="db-badges">
+                @foreach (var kv in badgeMap)
+                {
+                    <span class="db-badge">@kv.Value @kv.Key</span>
+                }
+            </div>
+        </div>
+    </div>
+
+    </div><!-- end .db-wrap -->
+}
+
+
+@section Scripts {
+<script>
+(function () {
+    // Toast for visit
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('visited') === 'true') {
+        const toast = document.createElement('div');
+        toast.className = 'toast toast--success';
+        toast.setAttribute('role', 'status');
+        toast.textContent = 'Visit recorded! +points earned';
+        document.body.appendChild(toast);
+        requestAnimationFrame(() => toast.classList.add('toast--show'));
+        setTimeout(() => { toast.classList.remove('toast--show'); setTimeout(() => toast.remove(), 300); }, 3000);
+    }
+
+    // Animated points counter
+    const ptEl = document.getElementById('dash-pts-anim');
+    if (ptEl) {
+        const target = parseInt(ptEl.dataset.val || '0', 10);
+        let current = 0;
+        const step = Math.max(1, Math.ceil(target / 40));
+        const interval = setInterval(() => {
+            current = Math.min(current + step, target);
+            ptEl.textContent = current;
+            if (current >= target) clearInterval(interval);
+        }, 30);
+    }
+
+    // Animate progress bar
+    const fill = document.getElementById('dbProgressFill');
+    if (fill) {
+        const pct = fill.dataset.pct || '0';
+        setTimeout(() => { fill.style.width = pct + '%'; }, 200);
+    }
+})();
+
+// ═══════════ TUTORIAL WALKTHROUGH ═══════════
+(function() {
+    if (localStorage.getItem('makautech-tour-done')) return;
+    if (!document.getElementById('tour-stats')) return;
+
+    const steps = [
+        {
+            target: null,
+            title: 'Welcome to MakauTech! 🦢',
+            text: 'Let us give you a quick tour so you know how everything works.',
+            position: 'center'
+        },
+        {
+            target: '#tour-stats',
+            title: 'Your Stats 📊',
+            text: 'Track your progress here — points earned, places visited, games played, and badges unlocked.',
+            position: 'bottom'
+        },
+        {
+            target: '#tour-explore',
+            title: 'Explore Sibu 📍',
+            text: 'Discover 16 amazing places in Sibu — temples, nature reserves, food spots, and more. Visit places to earn points!',
+            position: 'bottom'
+        },
+        {
+            target: '#tour-games',
+            title: 'Play Games 🎮',
+            text: 'Play fun mini games like Spin & Win, Memory Flip, and Kitchen Rush. Each game earns you up to 50 points!',
+            position: 'bottom'
+        },
+        {
+            target: null,
+            title: "You're all set! 🎉",
+            text: 'Explore places, play games, earn points, and climb the leaderboard. Have fun discovering Sibu!',
+            position: 'center'
+        }
+    ];
+
+    let current = 0;
+
+    // Inject CSS
+    const style = document.createElement('style');
+    style.textContent = `
+        .tour-overlay{position:fixed;inset:0;z-index:9998;pointer-events:none;}
+        .tour-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9997;transition:opacity 0.3s;}
+        .tour-highlight{position:absolute;z-index:9999;border-radius:16px;box-shadow:0 0 0 4px #22c55e,0 0 0 9999px rgba(0,0,0,0.7);transition:all 0.4s ease;pointer-events:none;}
+        .tour-tooltip{position:fixed;z-index:10000;background:#111;border:1.5px solid rgba(34,197,94,0.4);border-radius:16px;padding:1.5rem;max-width:320px;width:calc(100vw - 2rem);color:#fff;box-shadow:0 20px 60px rgba(0,0,0,0.5);animation:tourFadeIn 0.3s ease;}
+        .tour-tooltip.center{top:50%;left:50%;transform:translate(-50%,-50%);}
+        .tour-tooltip h3{font-size:1.1rem;font-weight:800;margin-bottom:0.4rem;color:#4ade80;}
+        .tour-tooltip p{font-size:0.88rem;color:rgba(255,255,255,0.75);line-height:1.6;margin-bottom:1rem;}
+        .tour-footer{display:flex;justify-content:space-between;align-items:center;gap:0.5rem;}
+        .tour-dots{display:flex;gap:0.35rem;}
+        .tour-dot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,0.2);}
+        .tour-dot.active{background:#22c55e;width:18px;border-radius:4px;}
+        .tour-btn{padding:0.5rem 1.2rem;border-radius:10px;font-size:0.85rem;font-weight:700;border:none;cursor:pointer;transition:all 0.2s;}
+        .tour-btn-next{background:#22c55e;color:#000;}
+        .tour-btn-next:hover{background:#16a34a;transform:translateY(-1px);}
+        .tour-btn-skip{background:transparent;color:rgba(255,255,255,0.4);font-size:0.78rem;}
+        .tour-btn-skip:hover{color:rgba(255,255,255,0.7);}
+        .tour-step-count{font-size:0.72rem;color:rgba(255,255,255,0.3);}
+        @@keyframes tourFadeIn{from{opacity:0;transform:translate(-50%,-50%) scale(0.95);}to{opacity:1;transform:translate(-50%,-50%) scale(1);}}
+    `;
+    document.head.appendChild(style);
+
+    function showStep(i) {
+        // Remove old
+        document.querySelectorAll('.tour-backdrop,.tour-highlight,.tour-tooltip').forEach(e=>e.remove());
+
+        const s = steps[i];
+        const isCenter = s.position === 'center' || !s.target;
+
+        // Backdrop
+        if (isCenter) {
+            const bd = document.createElement('div');
+            bd.className = 'tour-backdrop';
+            document.body.appendChild(bd);
+        }
+
+        // Highlight target
+        if (!isCenter && s.target) {
+            const el = document.querySelector(s.target);
+            if (el) {
+                el.scrollIntoView({ behavior:'smooth', block:'center' });
+                setTimeout(()=>{
+                    const r = el.getBoundingClientRect();
+                    const hl = document.createElement('div');
+                    hl.className = 'tour-highlight';
+                    hl.style.cssText = `top:${r.top+window.scrollY-8}px;left:${r.left-8}px;width:${r.width+16}px;height:${r.height+16}px;`;
+                    document.body.appendChild(hl);
+                }, 350);
+            }
+        }
+
+        // Tooltip
+        const tip = document.createElement('div');
+        tip.className = 'tour-tooltip' + (isCenter ? ' center' : '');
+        tip.innerHTML = `
+            <h3>${s.title}</h3>
+            <p>${s.text}</p>
+            <div class="tour-footer">
+                <div class="tour-dots">${steps.map((_,j)=>`<div class="tour-dot${j===i?' active':''}"></div>`).join('')}</div>
+                <div style="display:flex;gap:0.5rem;align-items:center;">
+                    <button class="tour-btn tour-btn-skip" onclick="window._tourSkip()">Skip</button>
+                    <button class="tour-btn tour-btn-next" onclick="window._tourNext()">${i===steps.length-1?'Get Started →':'Next'}</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(tip);
+
+        // Position tooltip near target
+        if (!isCenter && s.target) {
+            setTimeout(()=>{
+                const el = document.querySelector(s.target);
+                if (el) {
+                    const r = el.getBoundingClientRect();
+                    tip.classList.remove('center');
+                    tip.style.position = 'absolute';
+                    tip.style.top = (r.bottom + window.scrollY + 16) + 'px';
+                    tip.style.left = Math.max(16, Math.min(r.left, window.innerWidth - 340)) + 'px';
+                    tip.style.transform = 'none';
+                    tip.style.animation = 'tourFadeIn 0.3s ease';
+                }
+            }, 400);
+        }
+    }
+
+    window._tourNext = function() {
+        current++;
+        if (current >= steps.length) {
+            localStorage.setItem('makautech-tour-done', '1');
+            document.querySelectorAll('.tour-backdrop,.tour-highlight,.tour-tooltip').forEach(e=>e.remove());
+            return;
+        }
+        showStep(current);
+    };
+
+    window._tourSkip = function() {
+        localStorage.setItem('makautech-tour-done', '1');
+        document.querySelectorAll('.tour-backdrop,.tour-highlight,.tour-tooltip').forEach(e=>e.remove());
+    };
+
+    // Start tour after 1s delay
+    setTimeout(() => showStep(0), 1000);
+})();
+</script>
+}
