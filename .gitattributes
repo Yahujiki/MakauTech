@@ -1,0 +1,30 @@
+# Normalize line endings
+* text=auto
+
+# Razor views are C#, not HTML (GitHub linguist stats)
+*.cshtml linguist-language=C#
+*.razor  linguist-language=C#
+
+# Vendored frontend libraries — exclude from stats
+MakauTech/wwwroot/lib/** linguist-vendored=true
+**/*.min.js linguist-generated=true
+**/*.min.css linguist-generated=true
+**/*.min.map linguist-generated=true
+
+# Generated / build output
+**/bin/** linguist-generated=true
+**/obj/** linguist-generated=true
+
+# Documentation
+*.md text diff=markdown
+
+# Binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.ico binary
+*.pdf binary
+*.woff binary
+*.woff2 binary
