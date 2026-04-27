@@ -13,8 +13,21 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] · MakauTech</title>
+    <meta name="description" content="Discover Sibu, Sarawak — Foochow food, Rajang River, jungle escapes. Explore curated places, play mini-games, earn badges." />
+    <meta name="theme-color" content="#10b981" />
     <link rel="icon" type="image/png" href="~/Images/icon.png" />
     <link rel="apple-touch-icon" href="~/Images/icon.png" />
+
+    @* Open Graph / social previews *@
+    <meta property="og:site_name" content="MakauTech" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="@(ViewData["Title"] ?? "MakauTech")" />
+    <meta property="og:description" content="Tourism app for Sibu, Sarawak — places, reviews, games, leaderboard." />
+    <meta property="og:image" content="@Url.Content("~/Images/Background.jpg")" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="@(ViewData["Title"] ?? "MakauTech")" />
+    <meta name="twitter:description" content="Tourism app for Sibu, Sarawak — places, reviews, games, leaderboard." />
+    <meta name="twitter:image" content="@Url.Content("~/Images/Background.jpg")" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />

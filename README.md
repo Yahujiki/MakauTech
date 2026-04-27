@@ -1,5 +1,11 @@
 # MakauTech
 
+[![.NET 8](https://img.shields.io/badge/.NET-8.0-512BD4?logo=dotnet&logoColor=white)](https://dotnet.microsoft.com)
+[![ASP.NET Core](https://img.shields.io/badge/ASP.NET%20Core-MVC-5C2D91?logo=.net&logoColor=white)](https://learn.microsoft.com/aspnet/core)
+[![MySQL](https://img.shields.io/badge/MySQL-Pomelo-4479A1?logo=mysql&logoColor=white)](https://github.com/PomeloFoundation/Pomelo.EntityFrameworkCore.MySql)
+[![Status](https://img.shields.io/badge/status-active-22c55e)](#)
+[![Changelog](https://img.shields.io/badge/changelog-keepachangelog-fb923c)](CHANGELOG.md)
+
 Tourism web application for Sibu, Sarawak — discover places, write reviews, play short games, climb a leaderboard.
 
 Built with **ASP.NET Core 8 MVC**, **Entity Framework Core**, and **MySQL** (Pomelo provider). Deployed to an Oracle Cloud VPS behind nginx + kestrel.
