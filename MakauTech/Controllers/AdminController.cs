@@ -301,5 +301,117 @@ namespace MakauTech.Controllers
             }
             return RedirectToAction("Dashboard");
         }
+
+        // ============ UPDATES (public daily news) ============
+        public IActionResult Updates()
+        {
+            if (!IsAdmin()) return RedirectToAction("Login", "Home");
+            SetViewBag();
+            var list = _context.Updates.OrderByDescending(u => u.CreatedAt).ToList();
+            return View(list);
+        }
+
+        public IActionResult CreateUpdate()
+        {
+            if (!IsAdmin()) return RedirectToAction("Login", "Home");
+            SetViewBag();
+            return View(new Update());
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult CreateUpdate(Update model, IFormFile? image)
+        {
+            if (!IsAdmin()) return RedirectToAction("Login", "Home");
+
+            if (string.IsNullOrWhiteSpace(model.Title) || string.IsNullOrWhiteSpace(model.Body))
+            {
+                TempData["AdminError"] = "Title and body are required.";
+                SetViewBag();
+                return View(model);
+            }
+
+            // Image upload (optional, validated like other uploads)
+            if (image != null && image.Length > 0)
+            {
+                if (image.Length > 4 * 1024 * 1024)
+                {
+                    TempData["AdminError"] = "Image too large. Max 4 MB.";
+                    SetViewBag();
+                    return View(model);
+                }
+                var ext = Path.GetExtension(image.FileName).ToLowerInvariant();
+                var allowed = new[] { ".jpg", ".jpeg", ".png", ".webp", ".gif" };
+                if (!allowed.Contains(ext))
+                {
+                    TempData["AdminError"] = "Image must be jpg/png/webp/gif.";
+                    SetViewBag();
+                    return View(model);
+                }
+                try
+                {
+                    var dir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "updates");
+                    Directory.CreateDirectory(dir);
+                    var fileName = $"upd_{Guid.NewGuid():N}{ext}";
+                    using var fs = new FileStream(Path.Combine(dir, fileName), FileMode.Create);
+                    image.CopyTo(fs);
+                    model.ImageUrl = $"/uploads/updates/{fileName}";
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "Failed to save update image");
+                }
+            }
+
+            var admin = _context.Users.Find(HttpContext.Session.GetInt32("UserId")) as Admin;
+            model.AuthorName = admin?.Name ?? "Admin";
+            model.CreatedAt = DateTime.UtcNow;
+
+            _context.Updates.Add(model);
+            _context.SaveChanges();
+            TempData["AdminSuccess"] = "Update published.";
+            return RedirectToAction("Updates");
+        }
+
+        public IActionResult EditUpdate(int id)
+        {
+            if (!IsAdmin()) return RedirectToAction("Login", "Home");
+            var u = _context.Updates.Find(id);
+            if (u == null) return RedirectToAction("Updates");
+            SetViewBag();
+            return View(u);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult EditUpdate(int id, Update model)
+        {
+            if (!IsAdmin()) return RedirectToAction("Login", "Home");
+            var existing = _context.Updates.Find(id);
+            if (existing == null) return RedirectToAction("Updates");
+
+            existing.Title = model.Title?.Trim() ?? "";
+            existing.Summary = model.Summary?.Trim() ?? "";
+            existing.Body = model.Body ?? "";
+            existing.IsPublished = model.IsPublished;
+            _context.SaveChanges();
+            TempData["AdminSuccess"] = "Update edited.";
+            return RedirectToAction("Updates");
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult DeleteUpdate(int id)
+        {
+            if (!IsAdmin()) return RedirectToAction("Login", "Home");
+            var u = _context.Updates.Find(id);
+            if (u != null)
+            {
+                _context.Updates.Remove(u);
+                _context.SaveChanges();
+                TempData["AdminSuccess"] = "Update deleted.";
+            }
+            return RedirectToAction("Updates");
+        }
     }
 }

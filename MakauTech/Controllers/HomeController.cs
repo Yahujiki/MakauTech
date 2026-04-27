@@ -70,6 +70,19 @@ namespace MakauTech.Controllers
                 var topThree = _context.Users
                     .Where(u => u.Email != "admin@makautech.com")
                     .OrderByDescending(u => u.Points).Take(3).ToList();
+
+                List<Update> latestUpdates;
+                try
+                {
+                    latestUpdates = _context.Updates
+                        .Where(u => u.IsPublished)
+                        .OrderByDescending(u => u.CreatedAt)
+                        .Take(3)
+                        .ToList();
+                }
+                catch { latestUpdates = new List<Update>(); }
+                ViewBag.LatestUpdates = latestUpdates;
+
                 return View(new DashboardViewModel
                 {
                     FeaturedPlaces = featured,
@@ -481,6 +494,25 @@ CREATE TABLE IF NOT EXISTS `PlaceLikes` (
         {
             SetViewBagUser();
             return View();
+        }
+
+        // Public daily updates feed — visible to everyone.
+        public IActionResult Updates()
+        {
+            SetViewBagUser();
+            var list = _context.Updates
+                .Where(u => u.IsPublished)
+                .OrderByDescending(u => u.CreatedAt)
+                .ToList();
+            return View(list);
+        }
+
+        public IActionResult UpdateDetail(int id)
+        {
+            SetViewBagUser();
+            var u = _context.Updates.FirstOrDefault(x => x.Id == id && x.IsPublished);
+            if (u == null) return RedirectToAction("Updates");
+            return View(u);
         }
 
         public IActionResult Terms()

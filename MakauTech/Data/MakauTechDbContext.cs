@@ -16,6 +16,7 @@ namespace MakauTech.Data
         public DbSet<PlaceLike> PlaceLikes { get; set; }
         public DbSet<Achievement> Achievements { get; set; }
         public DbSet<Feedback> Feedbacks { get; set; }
+        public DbSet<Update> Updates { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -1,0 +1,102 @@
+@model MakauTech.Models.Update
+@{
+    ViewData["Title"] = Model.Title;
+}
+
+@section Styles {
+    <style>
+        .ud-wrap { max-width: 760px; margin: 32px auto; padding: 0 20px; }
+        .ud-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--mk-slate-600);
+            font-size: 13.5px;
+            font-weight: 600;
+            text-decoration: none;
+            margin-bottom: 24px;
+        }
+        .ud-back:hover { color: var(--mk-emerald-700); }
+
+        .ud-meta {
+            display: flex;
+            gap: 14px;
+            font-size: 12.5px;
+            color: var(--mk-slate-500, #64748b);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+        .ud-meta .badge {
+            background: rgba(16, 185, 129, 0.12);
+            color: var(--mk-emerald-700);
+            padding: 4px 10px;
+            border-radius: 999px;
+        }
+
+        .ud-title {
+            font-family: var(--mk-font-display);
+            font-size: clamp(28px, 5vw, 44px);
+            font-weight: 700;
+            color: var(--mk-night-900);
+            margin: 0 0 14px;
+            line-height: 1.1;
+            letter-spacing: -0.02em;
+        }
+
+        .ud-summary {
+            font-size: 18px;
+            color: var(--mk-slate-700);
+            line-height: 1.6;
+            margin: 0 0 24px;
+            font-style: italic;
+        }
+
+        .ud-img {
+            width: 100%;
+            aspect-ratio: 16/9;
+            object-fit: cover;
+            border-radius: var(--mk-r-lg);
+            margin: 24px 0;
+            box-shadow: var(--mk-shadow-lg);
+        }
+
+        .ud-body {
+            font-size: 16.5px;
+            color: var(--mk-slate-700);
+            line-height: 1.75;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .ud-body p { margin: 0 0 16px; }
+
+        [data-theme="dark"] .ud-title { color: #f1f5f9; }
+        [data-theme="dark"] .ud-summary,
+        [data-theme="dark"] .ud-body { color: #cbd5e1; }
+    </style>
+}
+
+<article class="ud-wrap mk-fade-in">
+    <a href="@Url.Action("Updates","Home")" class="ud-back">← Back to all updates</a>
+
+    <div class="ud-meta">
+        <span class="badge">📢 Update</span>
+        <span>@Model.CreatedAt.ToLocalTime().ToString("dd MMMM yyyy")</span>
+        <span>By @Model.AuthorName</span>
+    </div>
+
+    <h1 class="ud-title">@Model.Title</h1>
+
+    @if (!string.IsNullOrEmpty(Model.Summary))
+    {
+        <p class="ud-summary">@Model.Summary</p>
+    }
+
+    @if (!string.IsNullOrEmpty(Model.ImageUrl))
+    {
+        <img src="@Model.ImageUrl" alt="@Model.Title" class="ud-img" loading="lazy" />
+    }
+
+    <div class="ud-body">@Model.Body</div>
+</article>

@@ -147,6 +147,16 @@ erDiagram
         string AttachmentUrl
         datetime CreatedAt
     }
+    UPDATE {
+        int Id PK
+        string Title
+        string Summary
+        string Body
+        string ImageUrl
+        string AuthorName
+        bool IsPublished
+        datetime CreatedAt
+    }
             </pre>
         </div>
         <div class="arch-note">
@@ -171,11 +181,11 @@ erDiagram
         <h3>BaseEntity (defines the convention)</h3>
         <pre class="arch-code"><span class="kw">public abstract class</span> <span class="ty">BaseEntity</span>
 {
-    <span class="kw">public int</span> Id { <span class="kw">get</span>; <span class="kw">protected set</span>; }    <span class="cm">// Primary key — auto-increment</span>
+    <span class="kw">public int</span> Id { <span class="kw">get</span>; <span class="kw">set</span>; }                        <span class="cm">// Primary key — auto-increment</span>
     <span class="kw">public</span> DateTime CreatedAt { <span class="kw">get</span>; <span class="kw">set</span>; } = DateTime.Now;
 
     <span class="kw">public abstract string</span> GetDisplayInfo();
-    <span class="kw">public abstract string</span> GetEntityType();
+    <span class="kw">public virtual string</span> GetEntityType() =&gt; <span class="kw">this</span>.GetType().Name;
 }</pre>
         <p class="file-ref">Models/BaseEntity.cs:3</p>
 

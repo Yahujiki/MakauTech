@@ -144,6 +144,24 @@ CREATE TABLE IF NOT EXISTS `Feedbacks` (
     }
     catch { }
 
+    try
+    {
+        context.Database.ExecuteSqlRaw(@"
+CREATE TABLE IF NOT EXISTS `Updates` (
+  `Id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `Title` VARCHAR(300) NOT NULL DEFAULT '',
+  `Summary` VARCHAR(500) NOT NULL DEFAULT '',
+  `Body` TEXT NOT NULL,
+  `ImageUrl` TEXT NULL,
+  `AuthorName` VARCHAR(150) NOT NULL DEFAULT 'Admin',
+  `IsPublished` TINYINT(1) NOT NULL DEFAULT 1,
+  `CreatedAt` DATETIME NOT NULL,
+  INDEX `IX_Updates_CreatedAt` (`CreatedAt`),
+  INDEX `IX_Updates_IsPublished` (`IsPublished`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
+    }
+    catch { }
+
     MakauTech.Data.DbSeeder.Seed(context, app.Configuration);
 }
 
