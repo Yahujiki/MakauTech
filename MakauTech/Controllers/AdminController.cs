@@ -285,6 +285,7 @@ namespace MakauTech.Controllers
                 _context.Database.ExecuteSqlRaw("DELETE FROM `Reviews`");
                 _context.Database.ExecuteSqlRaw("DELETE FROM `PlaceLikes`");
                 _context.Database.ExecuteSqlRaw("DELETE FROM `Feedbacks`");
+                _context.Database.ExecuteSqlRaw("DELETE FROM `Updates`");
                 _context.Database.ExecuteSqlRaw("DELETE FROM `Users` WHERE `Discriminator` != 'Admin'");
                 _context.Database.ExecuteSqlRaw("UPDATE `Places` SET `VisitCount` = 0, `Rating` = 0");
 

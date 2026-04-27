@@ -160,20 +160,24 @@
             box-shadow: var(--mk-shadow-sm);
             text-align: center;
         }
-        .leader-card-rank {
-            font-family: var(--mk-font-display);
-            font-size: 56px;
-            font-weight: 900;
+        .leader-medal {
+            font-size: 48px;
             line-height: 1;
-            background: var(--mk-grad-accent);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
+            filter: drop-shadow(0 4px 10px rgba(0,0,0,0.18));
         }
-        .leader-card[data-rank="1"] .leader-card-rank { background: linear-gradient(135deg,#fbbf24,#d97706); -webkit-background-clip: text; background-clip: text; }
-        .leader-card[data-rank="2"] .leader-card-rank { background: linear-gradient(135deg,#94a3b8,#475569); -webkit-background-clip: text; background-clip: text; }
-        .leader-card[data-rank="3"] .leader-card-rank { background: linear-gradient(135deg,#f97316,#9a3412); -webkit-background-clip: text; background-clip: text; }
+        .leader-rank-num {
+            font-family: var(--mk-font-display);
+            font-size: 13px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.10em;
+            color: var(--mk-slate-500, #64748b);
+            margin-bottom: 6px;
+        }
+        .leader-card[data-rank="1"] .leader-rank-num { color: #b45309; }
+        .leader-card[data-rank="2"] .leader-rank-num { color: #475569; }
+        .leader-card[data-rank="3"] .leader-rank-num { color: #c2410c; }
         .leader-name { font-weight: 700; color: var(--mk-night-900); font-size: 15px; margin-bottom: 4px; }
         .leader-pts { font-size: 13px; color: var(--mk-slate-600); }
         [data-theme="dark"] .leader-card { background: var(--mk-night-800); border-color: rgba(255,255,255,0.06); }
@@ -207,14 +211,16 @@
         }
         .games-promo-sub { color: rgba(255,255,255,0.85); max-width: 520px; margin: 0 auto 28px; font-size: 16px; }
         .games-icons {
-            display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;
-            font-size: 36px; margin-bottom: 28px;
+            display: flex; gap: 18px; justify-content: center; flex-wrap: wrap;
+            font-size: 32px; margin-bottom: 28px;
+            opacity: 0.92;
         }
-        .games-icons span { animation: mk-float 4s ease-in-out infinite; }
-        .games-icons span:nth-child(2) { animation-delay: 0.5s; }
-        .games-icons span:nth-child(3) { animation-delay: 1s; }
-        .games-icons span:nth-child(4) { animation-delay: 1.5s; }
-        .games-icons span:nth-child(5) { animation-delay: 2s; }
+        .games-icons span {
+            display: inline-block;
+            transition: transform 0.25s ease;
+            filter: drop-shadow(0 4px 12px rgba(0,0,0,0.2));
+        }
+        .games-icons span:hover { transform: translateY(-3px) scale(1.08); }
     </style>
 }
 
@@ -394,7 +400,8 @@
         {
             var u = Model.TopThree[i];
             <div class="leader-card mk-fade-in" data-rank="@(i+1)">
-                <div class="leader-card-rank">@(i == 0 ? "🥇" : i == 1 ? "🥈" : "🥉")</div>
+                <div class="leader-rank-num">Rank #@(i+1)</div>
+                <div class="leader-medal" aria-hidden="true">@(i == 0 ? "🥇" : i == 1 ? "🥈" : "🥉")</div>
                 <div class="leader-name">@u.Name</div>
                 <div class="leader-pts">@u.Points pts</div>
             </div>
