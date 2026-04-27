@@ -476,6 +476,13 @@ CREATE TABLE IF NOT EXISTS `PlaceLikes` (
             return View();
         }
 
+        // Academic showcase page — ERD, PK/FK, inheritance, polymorphism for lecturer review.
+        public IActionResult Architecture()
+        {
+            SetViewBagUser();
+            return View();
+        }
+
         public IActionResult Terms()
         {
             SetViewBagUser();
