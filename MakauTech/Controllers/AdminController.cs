@@ -267,36 +267,37 @@ namespace MakauTech.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult FactoryReset()
+        public IActionResult FactoryReset(string? confirmText)
         {
             if (!IsAdmin()) return RedirectToAction("Login", "Home");
+
+            // Require user to type "RESET" exactly — second confirmation barrier.
+            if (!string.Equals(confirmText, "RESET", StringComparison.Ordinal))
+            {
+                TempData["AdminError"] = "Factory reset cancelled — confirmation phrase did not match.";
+                return RedirectToAction("Dashboard");
+            }
+
+            using var tx = _context.Database.BeginTransaction();
             try
             {
-                // 1. Delete all reviews
-                _context.Database.ExecuteSqlRaw(@"DELETE FROM ""Reviews""");
-
-                // 2. Delete all place likes
-                _context.Database.ExecuteSqlRaw(@"DELETE FROM ""PlaceLikes""");
-
-                // 3. Delete all non-admin users (Discriminator != 'Admin')
-                _context.Database.ExecuteSqlRaw(
-                    @"DELETE FROM ""Users"" WHERE ""Discriminator"" != 'Admin'");
-
-                // 4. Reset place visit counts and ratings
-                _context.Database.ExecuteSqlRaw(
-                    @"UPDATE ""Places"" SET ""VisitCount"" = 0, ""Rating"" = 0");
-
-                // 5. Reset auto-increment IDs for wiped tables
-                _context.Database.ExecuteSqlRaw(
-                    @"DELETE FROM ""sqlite_sequence"" WHERE ""name"" IN ('Reviews','PlaceLikes','Users')");
+                // MySQL syntax with backticks. All-or-nothing via transaction.
+                _context.Database.ExecuteSqlRaw("DELETE FROM `Reviews`");
+                _context.Database.ExecuteSqlRaw("DELETE FROM `PlaceLikes`");
+                _context.Database.ExecuteSqlRaw("DELETE FROM `Feedbacks`");
+                _context.Database.ExecuteSqlRaw("DELETE FROM `Users` WHERE `Discriminator` != 'Admin'");
+                _context.Database.ExecuteSqlRaw("UPDATE `Places` SET `VisitCount` = 0, `Rating` = 0");
 
                 _context.SaveChanges();
+                tx.Commit();
+
                 TempData["AdminSuccess"] = "Factory reset complete — all user data wiped. Admin account preserved.";
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Factory reset failed");
-                TempData["AdminError"] = "Factory reset failed. Check server logs for details.";
+                tx.Rollback();
+                _logger.LogError(ex, "Factory reset failed; transaction rolled back");
+                TempData["AdminError"] = "Factory reset failed. Database rolled back to previous state. Check server logs.";
             }
             return RedirectToAction("Dashboard");
         }

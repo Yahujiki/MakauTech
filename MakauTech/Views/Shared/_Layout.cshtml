@@ -19,9 +19,12 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/polish.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/games.css" asp-append-version="true" />
     @await RenderSectionAsync("Styles", required: false)
 </head>
 <body class="@(ViewBag.IsLoggedIn == true ? "has-sidebar" : "no-sidebar")">
+    @* Antiforgery token rendered globally so AJAX endpoints (game submit, AI chat) can read it. *@
+    @Html.AntiForgeryToken()
     <div class="app-shell">
         @if (ViewBag.IsLoggedIn == true)
         {
@@ -338,9 +341,10 @@
             sendBtn.disabled = true;
             showTyping();
             try {
+                const csrf = document.querySelector('input[name="__RequestVerificationToken"]')?.value || '';
                 const res = await fetch('/api/ai/chat', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrf, 'RequestVerificationToken': csrf },
                     body: JSON.stringify({ message: text })
                 });
                 const data = await res.json();

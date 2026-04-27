@@ -102,6 +102,7 @@ CREATE TABLE IF NOT EXISTS `PlaceLikes` (
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Microsoft.AspNetCore.RateLimiting.EnableRateLimiting("review")]
         [RequestSizeLimit(8_000_000)]
         [RequestFormLimits(MultipartBodyLengthLimit = 8_000_000)]
         public async Task<IActionResult> AddReview(int placeId, int rating, string comment, IFormFile? reviewPhoto)

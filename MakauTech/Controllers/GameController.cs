@@ -58,7 +58,8 @@ namespace MakauTech.Controllers
                         // Category question
                         var wrongCats = categories.Where(c => c.Id != place.CategoryId).OrderBy(x => rng.Next()).Take(3).Select(c => c.Name).ToList();
                         var options = wrongCats.Append(cat?.Name ?? "Nature").OrderBy(x => rng.Next()).ToList();
-                        questions.Add(new { question = $"What category is '{place.Name}'?", options, answer = cat?.Name ?? "Nature", hint = place.Description[..Math.Min(50, place.Description.Length)] + "..." });
+                        var hintDesc = place.Description ?? "";
+                        questions.Add(new { question = $"What category is '{place.Name}'?", options, answer = cat?.Name ?? "Nature", hint = hintDesc.Length > 0 ? hintDesc[..Math.Min(50, hintDesc.Length)] + "..." : "" });
                     }
                     else if (qType == 1)
                     {
@@ -69,9 +70,11 @@ namespace MakauTech.Controllers
                     else if (qType == 2)
                     {
                         // Name from description
+                        var desc = place.Description ?? "";
+                        if (desc.Length < 20) continue; // Need a meaningful description for this question type
                         var wrongPlaces = places.Where(p => p.Id != place.Id).OrderBy(x => rng.Next()).Take(3).Select(p => p.Name).ToList();
                         var options = wrongPlaces.Append(place.Name).OrderBy(x => rng.Next()).ToList();
-                        questions.Add(new { question = $"Which place is described as: '{place.Description[..Math.Min(60, place.Description.Length)]}...'?", options, answer = place.Name, hint = $"Category: {cat?.Name}" });
+                        questions.Add(new { question = $"Which place is described as: '{desc[..Math.Min(60, desc.Length)]}...'?", options, answer = place.Name, hint = $"Category: {cat?.Name}" });
                     }
                     else
                     {

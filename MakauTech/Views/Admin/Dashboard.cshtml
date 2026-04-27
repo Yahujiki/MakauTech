@@ -131,9 +131,16 @@
             @Html.AntiForgeryToken()
             <button type="submit" class="admin-btn-sm admin-btn-danger" style="padding:0.5rem 1rem;">🔄 Reset Leaderboard</button>
         </form>
-        <form method="post" asp-action="FactoryReset" onsubmit="return confirm('⚠️ FACTORY RESET: DELETE all users, reviews, likes. Only admin survives.\n\nAre you sure?') && confirm('⚡ FINAL CONFIRMATION: Proceed with factory reset?')">
+        <form method="post" asp-action="FactoryReset" id="factoryResetForm">
             @Html.AntiForgeryToken()
-            <button type="submit" class="admin-btn-sm admin-btn-danger" style="padding:0.5rem 1rem;">💀 Factory Reset</button>
+            <input type="hidden" name="confirmText" value="" />
+            <button type="button" class="admin-btn-sm admin-btn-danger" style="padding:0.5rem 1rem;" onclick="(function(f){
+                if (!confirm('⚠️ FACTORY RESET\n\nThis DELETES all users, reviews, likes, feedback.\nOnly the admin account survives.\n\nContinue?')) return;
+                var typed = prompt('Type the word  RESET  (capitals, no quotes) to confirm:');
+                if (typed !== 'RESET') { alert('Cancelled — phrase did not match.'); return; }
+                f.querySelector('input[name=confirmText]').value = typed;
+                f.submit();
+            })(document.getElementById('factoryResetForm'));">💀 Factory Reset</button>
         </form>
     </div>
 </div>

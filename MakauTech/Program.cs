@@ -44,10 +44,12 @@ builder.Services.AddAntiforgery(options =>
     options.Cookie.SameSite = SameSiteMode.Strict;
 });
 
-// Brute-force protection: per-IP limit on /Home/Login POSTs (belt-and-braces with account lockout)
+// Brute-force + abuse protection
 builder.Services.AddRateLimiter(options =>
 {
     options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+    // Login POSTs — per-IP, 10/min (belt-and-braces with account lockout)
     options.AddPolicy("login", httpContext =>
         RateLimitPartition.GetFixedWindowLimiter(
             partitionKey: httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
@@ -58,6 +60,38 @@ builder.Services.AddRateLimiter(options =>
                 QueueLimit = 0,
                 AutoReplenishment = true,
             }));
+
+    // Review submissions — per-user, 5/min (anti-spam)
+    options.AddPolicy("review", httpContext =>
+    {
+        var key = httpContext.Session.GetInt32("UserId")?.ToString()
+               ?? httpContext.Connection.RemoteIpAddress?.ToString() ?? "anon";
+        return RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: key,
+            factory: _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 5,
+                Window = TimeSpan.FromMinutes(1),
+                QueueLimit = 0,
+                AutoReplenishment = true,
+            });
+    });
+
+    // AI chat — per-user, 30/min
+    options.AddPolicy("ai", httpContext =>
+    {
+        var key = httpContext.Session.GetInt32("UserId")?.ToString()
+               ?? httpContext.Connection.RemoteIpAddress?.ToString() ?? "anon";
+        return RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: key,
+            factory: _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 30,
+                Window = TimeSpan.FromMinutes(1),
+                QueueLimit = 0,
+                AutoReplenishment = true,
+            });
+    });
 });
 
 if (!builder.Environment.IsDevelopment())

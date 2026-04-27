@@ -1,6 +1,7 @@
 ﻿@{
     ViewData["Title"] = "Quiz Game";
 }
+@Html.AntiForgeryToken()
 
 <div class="game-container">
     <div id="game-start" class="game-screen">
@@ -117,7 +118,12 @@
             const idx = Math.min(Math.floor(score / 2), 4);
             document.getElementById('result-message').textContent = msgs[idx];
             document.getElementById('result-title').textContent = lives <= 0 ? 'Game Over! 💔' : 'Quiz Complete! 🎉';
-            await fetch('/Game/SubmitScore', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ correctAnswers: score }) });
+            const csrf = document.querySelector('input[name="__RequestVerificationToken"]')?.value || '';
+            await fetch('/Game/SubmitScore', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrf, 'RequestVerificationToken': csrf },
+                body: JSON.stringify({ correctAnswers: score })
+            });
         }
     </script>
 }
