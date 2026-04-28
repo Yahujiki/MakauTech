@@ -13,19 +13,55 @@
             margin: 24px 16px 0;
             padding: clamp(48px, 8vw, 96px) clamp(24px, 6vw, 64px);
             border-radius: var(--mk-r-xl);
-            background: var(--mk-grad-hero);
+            background: #0a1f12;
             box-shadow: var(--mk-shadow-lg);
             overflow: hidden;
             isolation: isolate;
         }
+
+        /* Animated background — three Sibu photos crossfade with a slow ken-burns pan */
+        .home-hero-bg { position: absolute; inset: 0; overflow: hidden; z-index: -3; }
+        .home-hero-bg-img {
+            position: absolute;
+            inset: -8%;
+            background-size: cover;
+            background-position: center;
+            opacity: 0;
+            animation: hero-bg-cycle 36s ease-in-out infinite;
+            filter: saturate(1.05);
+        }
+        .home-hero-bg-img:nth-child(1) { animation-delay:  0s; }
+        .home-hero-bg-img:nth-child(2) { animation-delay: 12s; }
+        .home-hero-bg-img:nth-child(3) { animation-delay: 24s; }
+        @@keyframes hero-bg-cycle {
+            0%,   2%  { opacity: 0; transform: scale(1.00) translateY(0); }
+            8%, 30%   { opacity: 1; transform: scale(1.06) translateY(-2.5%); }
+            36%, 100% { opacity: 0; transform: scale(1.12) translateY(-6%); }
+        }
+
+        /* Tinted overlay so the hero copy stays readable */
         .home-hero::before {
             content: '';
             position: absolute; inset: 0;
             background:
-                radial-gradient(circle at 85% 15%, rgba(249,115,22,0.18) 0%, transparent 35%),
-                radial-gradient(circle at 15% 85%, rgba(16,185,129,0.18) 0%, transparent 40%);
+                radial-gradient(circle at 85% 15%, rgba(249,115,22,0.20) 0%, transparent 35%),
+                radial-gradient(circle at 15% 85%, rgba(16,185,129,0.18) 0%, transparent 45%),
+                linear-gradient(135deg, rgba(236,253,245,0.78), rgba(254,253,248,0.62) 50%, rgba(252,237,196,0.78));
             pointer-events: none;
-            z-index: -1;
+            z-index: -2;
+        }
+        [data-theme="dark"] .home-hero::before {
+            background:
+                radial-gradient(circle at 85% 15%, rgba(249,115,22,0.16) 0%, transparent 35%),
+                radial-gradient(circle at 15% 85%, rgba(16,185,129,0.20) 0%, transparent 45%),
+                linear-gradient(135deg, rgba(10,15,20,0.78), rgba(18,32,25,0.85));
+        }
+
+        @@media (prefers-reduced-motion: reduce) {
+            .home-hero-bg-img { animation: none; opacity: 0.45; }
+            .home-hero-bg-img:nth-child(1) { opacity: 0.6; }
+            .home-hero-bg-img:nth-child(2),
+            .home-hero-bg-img:nth-child(3) { display: none; }
         }
         .home-hero-grid {
             display: grid;
@@ -284,11 +320,78 @@
             color: var(--mk-slate-600);
             font-size: 14px;
         }
+
+        /* ── PARALLAX BREAK SECTIONS ── */
+        .mk-parallax {
+            position: relative;
+            min-height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            background-attachment: fixed;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            overflow: hidden;
+        }
+        .mk-parallax::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(6,20,12,0.68) 0%, rgba(0,0,0,0.45) 100%);
+        }
+        .mk-parallax-content {
+            position: relative;
+            z-index: 1;
+            max-width: 680px;
+            padding: 60px 28px;
+        }
+        .mk-parallax-tag {
+            display: inline-block;
+            font-size: 10.5px;
+            font-weight: 700;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: #6ee7b7;
+            border: 1px solid rgba(52,211,153,0.35);
+            padding: 3px 12px;
+            border-radius: 999px;
+            margin-bottom: 18px;
+        }
+        .mk-parallax-quote {
+            font-family: var(--mk-font-display);
+            font-size: clamp(22px, 4vw, 38px);
+            font-weight: 700;
+            color: #fff;
+            line-height: 1.25;
+            letter-spacing: -0.02em;
+            margin: 0 0 16px;
+        }
+        .mk-parallax-sub {
+            font-size: 14px;
+            color: rgba(255,255,255,0.5);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            margin: 0;
+        }
+        /* mobile: iOS doesn't support background-attachment:fixed properly */
+        @@media (max-width: 768px) {
+            .mk-parallax { background-attachment: scroll; min-height: 220px; }
+        }
+        @@media (prefers-reduced-motion: reduce) {
+            .mk-parallax { background-attachment: scroll; }
+        }
     </style>
 }
 
 <!-- ============= HERO ============= -->
 <section class="home-hero">
+    <div class="home-hero-bg" aria-hidden="true">
+        <div class="home-hero-bg-img" style="background-image:url('@Url.Content("~/Images/sibu-lake-garden.jpg")');"></div>
+        <div class="home-hero-bg-img" style="background-image:url('@Url.Content("~/Images/wisma-sanyan.jpg")');"></div>
+        <div class="home-hero-bg-img" style="background-image:url('@Url.Content("~/Images/central-market.jpg")');"></div>
+    </div>
     <div class="home-hero-grid">
         <div class="mk-fade-in">
             <div class="mk-hero-eyebrow">Sibu, Sarawak — The Swan City</div>
@@ -447,6 +550,15 @@
     </div>
 </section>
 
+<!-- ============= PARALLAX BREAK 1 ============= -->
+<div class="mk-parallax" style="background-image: url('/Images/rajang-river.jpg');" aria-hidden="true">
+    <div class="mk-parallax-content">
+        <span class="mk-parallax-tag">Rajang River</span>
+        <p class="mk-parallax-quote">"Malaysia's longest river flows right through Sibu's heart."</p>
+        <p class="mk-parallax-sub">Swan City &nbsp;·&nbsp; Sarawak &nbsp;·&nbsp; Borneo</p>
+    </div>
+</div>
+
 <!-- ============= FEATURED PLACES ============= -->
 @if (Model.FeaturedPlaces.Any())
 {
@@ -514,6 +626,15 @@
 </section>
 }
 
+<!-- ============= PARALLAX BREAK 2 ============= -->
+<div class="mk-parallax" style="background-image: url('/Images/sibu-night-market.jpg');" aria-hidden="true">
+    <div class="mk-parallax-content">
+        <span class="mk-parallax-tag">Night Market</span>
+        <p class="mk-parallax-quote">Every street corner hides a dish worth travelling for.</p>
+        <p class="mk-parallax-sub">Eat &nbsp;·&nbsp; Explore &nbsp;·&nbsp; Earn points</p>
+    </div>
+</div>
+
 <!-- ============= GAMES PROMO ============= -->
 <section class="games-promo">
     <div class="games-icons" aria-hidden="true">
@@ -562,4 +683,34 @@
         </a>
     </div>
 </section>
+}
+
+@section Scripts {
+<script>
+(function () {
+    // Smooth parallax depth — nudges backgroundPositionY as user scrolls.
+    // CSS background-attachment:fixed handles the base; this JS layer adds
+    // a proportional drift for a real depth feel. Disabled on mobile/reduced-motion.
+    var isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
+    var prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (isMobile || prefersReduced) return;
+
+    var panels = Array.prototype.slice.call(document.querySelectorAll('.mk-parallax'));
+    if (!panels.length) return;
+
+    function tick() {
+        var vih = window.innerHeight;
+        panels.forEach(function (el) {
+            var rect = el.getBoundingClientRect();
+            if (rect.bottom < -100 || rect.top > vih + 100) return;
+            // background drifts at 18 % of the panel's scroll position
+            var pct = ((rect.top + rect.height / 2) - vih / 2) * 0.18;
+            el.style.backgroundPositionY = 'calc(50% + ' + pct.toFixed(1) + 'px)';
+        });
+    }
+
+    window.addEventListener('scroll', tick, { passive: true });
+    tick();
+})();
+</script>
 }

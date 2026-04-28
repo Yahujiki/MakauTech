@@ -2,43 +2,368 @@
 @{
     ViewData["Title"] = "Register";
 }
-<div class="mk-auth-shell">
-    <div class="mk-auth-card mk-fade-in">
-        <div class="mk-auth-emoji" aria-hidden="true">🌟</div>
-        <h1 class="mk-auth-title">Join MakauTech</h1>
-        <p class="mk-auth-sub">Start exploring Sibu and earning rewards.</p>
 
-        @if (ViewBag.Error != null)
-        {
-            <div class="mk-alert mk-alert-error" role="alert">
-                <span aria-hidden="true">⚠️</span>
-                <span>@ViewBag.Error</span>
-            </div>
-        }
+@section Styles {
+<style>
+/* reuse the city-gate shell — same layout, different content */
+.city-gate {
+    position: fixed;
+    inset: 0;
+    z-index: 8000;
+    display: grid;
+    grid-template-columns: 1fr 460px;
+    overflow: hidden;
+}
+.cg-visual {
+    position: relative;
+    overflow: hidden;
+    background: #060e08;
+}
+.cg-photo {
+    position: absolute;
+    inset: 0;
+    background-image: url('/Images/bukit-lima.jpg');
+    background-size: cover;
+    background-position: center 35%;
+    filter: brightness(0.45) saturate(1.4);
+    /* static — no drift on auth pages */
+}
+.cg-overlay {
+    position: absolute;
+    inset: 0;
+    background:
+        linear-gradient(to right, rgba(0,0,0,0) 50%, #0d1a10 100%),
+        linear-gradient(to top,   rgba(0,20,10,0.9) 0%, transparent 55%);
+}
+.cg-particles { position:absolute;inset:0;overflow:hidden;pointer-events:none; }
+.cg-dot {
+    position: absolute;
+    width: 3px; height: 3px;
+    border-radius: 50%;
+    background: rgba(52,211,153,0.5);
+    animation: cg-float linear infinite;
+}
+.cg-dot:nth-child(1) { left:12%; bottom:-6px; animation-duration:16s; animation-delay:0s;   width:2px;height:2px; }
+.cg-dot:nth-child(2) { left:28%; bottom:-6px; animation-duration:19s; animation-delay:3s; }
+.cg-dot:nth-child(3) { left:44%; bottom:-6px; animation-duration:13s; animation-delay:1s;   width:4px;height:4px;opacity:.35; }
+.cg-dot:nth-child(4) { left:60%; bottom:-6px; animation-duration:21s; animation-delay:5s;   width:2px;height:2px; }
+.cg-dot:nth-child(5) { left:77%; bottom:-6px; animation-duration:17s; animation-delay:2s; }
+@@keyframes cg-float {
+    0%   { transform:translateY(0) scale(1); opacity:0; }
+    5%   { opacity:1; }
+    95%  { opacity:.5; }
+    100% { transform:translateY(-100vh) scale(0.5); opacity:0; }
+}
+.cg-visual-content {
+    position: relative;
+    z-index: 2;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;  /* JOIN SIBU at top of photo */
+    align-items: center;
+    text-align: center;
+    padding: 48px 48px 40px;
+}
+/* live stats strip */
+.cg-live-stats {
+    display: flex;
+    gap: 0;
+    border: 1px solid rgba(52,211,153,0.18);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 24px;
+}
+.cg-live-stat {
+    flex: 1;
+    text-align: center;
+    padding: 12px 14px;
+    border-right: 1px solid rgba(52,211,153,0.12);
+}
+.cg-live-stat:last-child { border-right: none; }
+.cg-live-stat-n {
+    display: block;
+    font-family: var(--mk-font-display,'Fraunces',serif);
+    font-size: 22px;
+    font-weight: 900;
+    color: #34d399;
+    line-height: 1;
+}
+.cg-live-stat-l {
+    display: block;
+    font-size: 9.5px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.3);
+    margin-top: 4px;
+}
+/* hero block — centered in photo panel */
+.cg-hero { display:flex;flex-direction:column;align-items:center; }
+.cg-live {
+    display:inline-flex;align-items:center;gap:6px;
+    background:rgba(52,211,153,0.14);border:1px solid rgba(52,211,153,0.3);
+    color:#6ee7b7;font-size:10.5px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;
+    padding:4px 12px;border-radius:999px;backdrop-filter:blur(6px);
+    width:fit-content;margin-bottom:20px;
+}
+/* logo in the dark form panel */
+.cg-panel-brand {
+    display:flex;align-items:center;gap:9px;margin-bottom:36px;
+}
+.cg-panel-brand img { width:30px;height:30px;border-radius:8px;opacity:0.85; }
+.cg-panel-brand-name { font-family:var(--mk-font-display,'Fraunces',serif);font-size:16px;font-weight:800;color:rgba(255,255,255,0.55);letter-spacing:-0.02em; }
+.cg-live::before {
+    content:'';width:6px;height:6px;border-radius:50%;background:#34d399;
+    animation:cg-pulse 2s ease infinite;
+}
+@@keyframes cg-pulse {
+    0%,100% { opacity:1; box-shadow:0 0 0 0 rgba(52,211,153,0.5); }
+    50%      { opacity:.5; box-shadow:0 0 0 4px rgba(52,211,153,0); }
+}
+.cg-city {
+    font-family:var(--mk-font-display,'Fraunces',serif);
+    font-size:clamp(64px,9vw,110px);
+    font-weight:900;line-height:0.88;letter-spacing:-0.05em;margin:0 0 18px;color:#fff;
+}
+.cg-city span { display:block;color:transparent;-webkit-text-stroke:1.5px rgba(255,255,255,0.35); }
+.cg-tagline { font-size:15px;color:rgba(255,255,255,0.5);letter-spacing:0.04em;margin:0 0 32px; }
+.cg-coords { font-family:'Courier New',monospace;font-size:11px;color:rgba(255,255,255,0.28);letter-spacing:0.1em;margin-bottom:8px; }
+.cg-stats { display:flex;gap:28px;margin-bottom:0;justify-content:center; }
+.cg-stat-n { font-family:var(--mk-font-display,'Fraunces',serif);font-size:28px;font-weight:900;color:#fff;line-height:1;display:block; }
+.cg-stat-l { font-size:10.5px;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:0.1em;margin-top:3px;display:block; }
 
-        <form method="post" asp-action="Register" novalidate>
-            <div class="mk-form-group">
-                <label for="regName">Name</label>
-                <input id="regName" type="text" name="Name" class="mk-form-control"
-                       placeholder="Your full name" autocomplete="name" required />
-            </div>
-            <div class="mk-form-group">
-                <label for="regEmail">Email</label>
-                <input id="regEmail" type="email" name="Email" class="mk-form-control"
-                       placeholder="you@example.com" autocomplete="email" required />
-            </div>
-            <div class="mk-form-group">
-                <label for="regPassword">Password</label>
-                <input id="regPassword" type="password" name="Password" class="mk-form-control"
-                       placeholder="At least 6 characters" autocomplete="new-password" minlength="6" required />
-            </div>
-            <button type="submit" class="mk-btn mk-btn-primary" style="width:100%; justify-content:center; padding:14px 22px; font-size:16px;">
-                Create Account
-            </button>
-        </form>
+/* form panel */
+.cg-form-panel {
+    position:relative;background:#0d1a10;
+    display:flex;flex-direction:column;overflow-y:auto;
+    border-left:1px solid rgba(52,211,153,0.12);
+}
+.cg-shimmer {
+    position:absolute;top:0;left:0;right:0;height:2px;
+    background:linear-gradient(90deg,transparent 0%,rgba(52,211,153,0.6) 30%,rgba(16,185,129,1) 50%,rgba(52,211,153,0.6) 70%,transparent 100%);
+    background-size:200% 100%;
+    animation:cg-shimmer-move 3s linear infinite;
+}
+@@keyframes cg-shimmer-move {
+    0%   { background-position:-100% 0; }
+    100% { background-position:200% 0; }
+}
+.cg-form-inner { flex:1;display:flex;flex-direction:column;justify-content:center;align-items:stretch;padding:40px 48px; }
+.cg-back {
+    display:inline-flex;align-items:center;gap:6px;
+    color:rgba(255,255,255,0.3);font-size:12px;font-weight:600;
+    text-decoration:none;letter-spacing:0.06em;margin-bottom:40px;transition:color 0.18s;
+}
+.cg-back:hover { color:#6ee7b7; }
+.cg-form-label { font-size:10.5px;font-weight:800;letter-spacing:0.16em;text-transform:uppercase;color:#34d399;margin-bottom:10px; }
+.cg-form-title { font-family:var(--mk-font-display,'Fraunces',serif);font-size:clamp(26px,3.5vw,34px);font-weight:800;color:#f0fdf4;margin:0 0 6px;letter-spacing:-0.03em;line-height:1.1; }
+.cg-form-sub { font-size:13.5px;color:rgba(255,255,255,0.32);margin:0 0 30px; }
 
-        <div style="text-align:center; margin-top:22px; font-size:14px; color:var(--mk-slate-600);">
-            Already have an account? <a asp-action="Login" style="color:var(--mk-emerald-600); font-weight:700;">Login here</a>
+.cg-alert {
+    background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.3);
+    border-radius:8px;padding:11px 14px;font-size:13px;color:#fca5a5;
+    margin-bottom:22px;display:flex;align-items:flex-start;gap:8px;
+}
+.cg-field { margin-bottom:26px; }
+.cg-field-label { display:block;font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:rgba(255,255,255,0.32);margin-bottom:8px; }
+.cg-field-wrap { position:relative; }
+.cg-field-icon {
+    position:absolute;left:0;top:50%;transform:translateY(-50%);
+    width:17px;height:17px;color:rgba(255,255,255,0.22);pointer-events:none;transition:color 0.2s;
+}
+.cg-input {
+    width:100%;background:transparent;border:none;
+    border-bottom:1px solid rgba(255,255,255,0.1);
+    padding:9px 0 9px 26px;font-size:15px;color:#f0fdf4;outline:none;transition:border-color 0.2s;
+}
+.cg-input::placeholder { color:rgba(255,255,255,0.18); }
+.cg-input:focus { border-bottom-color:#34d399; }
+.cg-input:focus ~ .cg-field-icon { color:#34d399; }
+.cg-field-line {
+    position:absolute;bottom:0;left:0;height:1px;width:0;
+    background:#34d399;transition:width 0.28s ease;
+}
+.cg-input:focus ~ .cg-field-line { width:100%; }
+
+.cg-submit {
+    width:100%;margin-top:6px;
+    background:linear-gradient(135deg,#10b981,#059669);
+    color:#fff;border:none;border-radius:10px;padding:15px 22px;
+    font-size:15px;font-weight:700;letter-spacing:0.04em;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;gap:10px;
+    transition:opacity 0.18s,transform 0.15s,box-shadow 0.18s;
+    box-shadow:0 4px 20px rgba(16,185,129,0.28);
+    position:relative;overflow:hidden;
+}
+.cg-submit::after {
+    content:'';position:absolute;inset:0;
+    background:linear-gradient(90deg,transparent,rgba(255,255,255,0.12),transparent);
+    transform:translateX(-100%);transition:transform 0.5s;
+}
+.cg-submit:hover::after { transform:translateX(100%); }
+.cg-submit:hover { opacity:.92;transform:translateY(-1px);box-shadow:0 8px 28px rgba(16,185,129,0.4); }
+.cg-submit:active { transform:translateY(0); }
+.cg-submit svg { width:17px;height:17px;transition:transform 0.2s; }
+.cg-submit:hover svg { transform:translateX(4px); }
+
+.cg-register { margin-top:24px;text-align:center;font-size:13px;color:rgba(255,255,255,0.3); }
+.cg-register a { color:#34d399;font-weight:700;text-decoration:none; }
+.cg-register a:hover { text-decoration:underline; }
+
+@@media (max-width: 840px) {
+    .city-gate { grid-template-columns:1fr;grid-template-rows:200px 1fr;position:relative;min-height:100vh; }
+    .cg-city { font-size:52px; }
+    .cg-stats,.cg-coords { display:none; }
+    .cg-live { margin-top:10px;margin-bottom:10px; }
+    .cg-visual-content { padding:22px 24px; }
+    .cg-form-inner { padding:32px 24px; }
+    .cg-back { margin-bottom:24px; }
+}
+</style>
+}
+
+<div class="city-gate">
+
+    <!-- ═══ LEFT: PHOTO PANEL ═══ -->
+    <div class="cg-visual">
+        <div class="cg-photo"></div>
+        <div class="cg-overlay"></div>
+        <div class="cg-particles">
+            <div class="cg-dot"></div>
+            <div class="cg-dot"></div>
+            <div class="cg-dot"></div>
+            <div class="cg-dot"></div>
+            <div class="cg-dot"></div>
+        </div>
+        <div class="cg-visual-content">
+            <!-- hero block — centered -->
+            <div class="cg-hero">
+                <span class="cg-live">Free · Always</span>
+                <p class="cg-coords">1.5555° N &nbsp;·&nbsp; 110.3333° E</p>
+                <h2 class="cg-city">
+                    JOIN
+                    <span>SIBU</span>
+                </h2>
+                <p class="cg-tagline">Earn badges &nbsp;·&nbsp; Play games &nbsp;·&nbsp; Discover Borneo</p>
+                <div class="cg-stats">
+                    <div class="cg-stat">
+                        <span class="cg-stat-n">50+</span>
+                        <span class="cg-stat-l">Places</span>
+                    </div>
+                    <div class="cg-stat">
+                        <span class="cg-stat-n">5</span>
+                        <span class="cg-stat-l">Games</span>
+                    </div>
+                    <div class="cg-stat">
+                        <span class="cg-stat-n">0 sen</span>
+                        <span class="cg-stat-l">Cost</span>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
+
+    <!-- ═══ RIGHT: FORM PANEL ═══ -->
+    <div class="cg-form-panel">
+        <div class="cg-shimmer"></div>
+        <div class="cg-form-inner">
+
+            <!-- MakauTech brand in form panel -->
+            <div class="cg-panel-brand">
+                <img src="/Images/icon.png" alt="MakauTech" />
+                <span class="cg-panel-brand-name">MakauTech</span>
+            </div>
+
+            <a href="/" class="cg-back">
+                <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/>
+                </svg>
+                Back to home
+            </a>
+
+            <!-- live stats -->
+            <div class="cg-live-stats">
+                <div class="cg-live-stat">
+                    <span class="cg-live-stat-n">@(ViewBag.UserCount ?? 0)</span>
+                    <span class="cg-live-stat-l">Explorers</span>
+                </div>
+                <div class="cg-live-stat">
+                    <span class="cg-live-stat-n">@(ViewBag.PlaceCount ?? 0)</span>
+                    <span class="cg-live-stat-l">Places</span>
+                </div>
+                <div class="cg-live-stat">
+                    <span class="cg-live-stat-n">Free</span>
+                    <span class="cg-live-stat-l">Always</span>
+                </div>
+            </div>
+
+            <p class="cg-form-label">Create account</p>
+            <h1 class="cg-form-title">Start your<br>Sibu story.</h1>
+            <p class="cg-form-sub">It's free. No credit card needed.</p>
+
+            @if (ViewBag.Error != null)
+            {
+                <div class="cg-alert" role="alert">
+                    <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" style="flex-shrink:0;margin-top:1px">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/>
+                    </svg>
+                    <span>@ViewBag.Error</span>
+                </div>
+            }
+
+            <form method="post" asp-action="Register" novalidate>
+                @Html.AntiForgeryToken()
+
+                <div class="cg-field">
+                    <label class="cg-field-label" for="regName">Full name</label>
+                    <div class="cg-field-wrap">
+                        <input id="regName" class="cg-input" type="text" name="Name"
+                               placeholder="Your name" autocomplete="name" required />
+                        <svg class="cg-field-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/>
+                        </svg>
+                        <div class="cg-field-line"></div>
+                    </div>
+                </div>
+
+                <div class="cg-field">
+                    <label class="cg-field-label" for="regEmail">Email address</label>
+                    <div class="cg-field-wrap">
+                        <input id="regEmail" class="cg-input" type="email" name="Email"
+                               placeholder="you@example.com" autocomplete="email" required />
+                        <svg class="cg-field-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"/>
+                        </svg>
+                        <div class="cg-field-line"></div>
+                    </div>
+                </div>
+
+                <div class="cg-field">
+                    <label class="cg-field-label" for="regPassword">Password</label>
+                    <div class="cg-field-wrap">
+                        <input id="regPassword" class="cg-input" type="password" name="Password"
+                               placeholder="At least 6 characters" autocomplete="new-password" minlength="6" required />
+                        <svg class="cg-field-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"/>
+                        </svg>
+                        <div class="cg-field-line"></div>
+                    </div>
+                </div>
+
+                <button type="submit" class="cg-submit">
+                    Create my account
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/>
+                    </svg>
+                </button>
+            </form>
+
+            <div class="cg-register">
+                Already have an account? <a asp-action="Login">Sign in →</a>
+            </div>
+
+        </div>
+    </div>
+
 </div>
