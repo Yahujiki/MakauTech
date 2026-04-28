@@ -96,6 +96,8 @@ namespace MakauTech.Controllers
         }
 
         // POST: /Game/SubmitScore
+        // Server-side bound: quiz has at most 10 questions × 3 pts = 30 pts max.
+        // Defends against forged client submissions with inflated correctAnswers.
         [HttpPost]
         public IActionResult SubmitScore([FromBody] ScoreSubmission submission)
         {
@@ -103,9 +105,15 @@ namespace MakauTech.Controllers
             {
                 var user = GetCurrentUser();
                 if (user == null) return Json(new { success = false });
-                int points = submission.CorrectAnswers * 3;
-                user.AddPoints(points);
-                _context.SaveChanges();
+
+                int correct = Math.Clamp(submission.CorrectAnswers, 0, 10);
+                int points  = Math.Clamp(correct * 3, 0, 30);
+
+                if (points > 0)
+                {
+                    user.AddPoints(points);
+                    _context.SaveChanges();
+                }
                 return Json(new { success = true, pointsEarned = points, totalPoints = user.Points });
             }
             catch (Exception)

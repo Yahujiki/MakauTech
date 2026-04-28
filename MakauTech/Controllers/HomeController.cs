@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MakauTech.Data;
+using MakauTech.Helpers;
 using MakauTech.Models;
 
 namespace MakauTech.Controllers
@@ -513,6 +514,18 @@ CREATE TABLE IF NOT EXISTS `PlaceLikes` (
             var u = _context.Updates.FirstOrDefault(x => x.Id == id && x.IsPublished);
             if (u == null) return RedirectToAction("Updates");
             return View(u);
+        }
+
+        // Sibu events calendar — public, hard-coded curated list of festivals and notable dates.
+        public IActionResult Calendar(int? month, int? year)
+        {
+            SetViewBagUser();
+            var today = DateTime.Today;
+            var m = month ?? today.Month;
+            var y = year ?? today.Year;
+            ViewBag.CurrentMonth = m;
+            ViewBag.CurrentYear  = y;
+            return View(SibuEvents.GetAll());
         }
 
         public IActionResult Terms()
