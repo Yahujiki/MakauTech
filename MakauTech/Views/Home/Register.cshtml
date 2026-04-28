@@ -26,12 +26,12 @@
     background-size: cover;
     background-position: center 35%;
     filter: brightness(0.45) saturate(1.4);
-    animation: cg-drift 32s ease-in-out infinite alternate;
+    animation: cg-drift 70s ease-in-out infinite alternate;
     will-change: transform;
 }
 @@keyframes cg-drift {
-    from { transform: scale(1.06) translate(0, 0); }
-    to   { transform: scale(1.13) translate(-1%, -2%); }
+    from { transform: scale(1.01) translate(0, 0); }
+    to   { transform: scale(1.05) translate(-0.4%, -0.6%); }
 }
 .cg-overlay {
     position: absolute;
@@ -69,18 +69,27 @@
 }
 .cg-logo { display:flex;align-items:center;gap:10px;text-decoration:none;width:fit-content; }
 .cg-logo-icon {
-    width:36px;height:36px;border-radius:9px;
-    background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.18);
-    backdrop-filter:blur(8px);display:grid;place-items:center;font-size:18px;
+    width:42px;height:42px;border-radius:11px;
+    background:rgba(255,255,255,0.15);border:1.5px solid rgba(255,255,255,0.28);
+    backdrop-filter:blur(10px);display:grid;place-items:center;font-size:22px;
+    box-shadow:0 4px 16px rgba(0,0,0,0.3);
 }
-.cg-logo-name { font-family:var(--mk-font-display,'Fraunces',serif);font-size:19px;font-weight:800;color:#fff;letter-spacing:-0.02em; }
+.cg-logo-name { font-family:var(--mk-font-display,'Fraunces',serif);font-size:20px;font-weight:800;color:#fff;letter-spacing:-0.02em;text-shadow:0 2px 8px rgba(0,0,0,0.4); }
+/* hero center — vertically centered in the photo panel */
+.cg-hero { flex:1;display:flex;flex-direction:column;justify-content:center; }
 .cg-live {
     display:inline-flex;align-items:center;gap:6px;
     background:rgba(52,211,153,0.14);border:1px solid rgba(52,211,153,0.3);
     color:#6ee7b7;font-size:10.5px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;
     padding:4px 12px;border-radius:999px;backdrop-filter:blur(6px);
-    width:fit-content;margin-top:auto;margin-bottom:20px;
+    width:fit-content;margin-bottom:20px;
 }
+/* logo in the dark form panel */
+.cg-panel-brand {
+    display:flex;align-items:center;gap:9px;margin-bottom:36px;
+}
+.cg-panel-brand img { width:30px;height:30px;border-radius:8px;opacity:0.85; }
+.cg-panel-brand-name { font-family:var(--mk-font-display,'Fraunces',serif);font-size:16px;font-weight:800;color:rgba(255,255,255,0.55);letter-spacing:-0.02em; }
 .cg-live::before {
     content:'';width:6px;height:6px;border-radius:50%;background:#34d399;
     animation:cg-pulse 2s ease infinite;
@@ -97,7 +106,7 @@
 .cg-city span { display:block;color:transparent;-webkit-text-stroke:1.5px rgba(255,255,255,0.35); }
 .cg-tagline { font-size:15px;color:rgba(255,255,255,0.5);letter-spacing:0.04em;margin:0 0 32px; }
 .cg-coords { font-family:'Courier New',monospace;font-size:11px;color:rgba(255,255,255,0.28);letter-spacing:0.1em;margin-bottom:8px; }
-.cg-stats { display:flex;gap:28px;margin-bottom:52px; }
+.cg-stats { display:flex;gap:28px;margin-bottom:0; }
 .cg-stat-n { font-family:var(--mk-font-display,'Fraunces',serif);font-size:28px;font-weight:900;color:#fff;line-height:1;display:block; }
 .cg-stat-l { font-size:10.5px;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:0.1em;margin-top:3px;display:block; }
 
@@ -210,27 +219,28 @@
                 <span class="cg-logo-name">MakauTech</span>
             </a>
 
-            <span class="cg-live">Free · Always</span>
-
-            <p class="cg-coords">1.5555° N &nbsp;·&nbsp; 110.3333° E</p>
-            <h2 class="cg-city">
-                JOIN
-                <span>SIBU</span>
-            </h2>
-            <p class="cg-tagline">Earn badges &nbsp;·&nbsp; Play games &nbsp;·&nbsp; Discover Borneo</p>
-
-            <div class="cg-stats">
-                <div class="cg-stat">
-                    <span class="cg-stat-n">50+</span>
-                    <span class="cg-stat-l">Places</span>
-                </div>
-                <div class="cg-stat">
-                    <span class="cg-stat-n">5</span>
-                    <span class="cg-stat-l">Games</span>
-                </div>
-                <div class="cg-stat">
-                    <span class="cg-stat-n">0 sen</span>
-                    <span class="cg-stat-l">Cost</span>
+            <!-- hero block — centered vertically -->
+            <div class="cg-hero">
+                <span class="cg-live">Free · Always</span>
+                <p class="cg-coords">1.5555° N &nbsp;·&nbsp; 110.3333° E</p>
+                <h2 class="cg-city">
+                    JOIN
+                    <span>SIBU</span>
+                </h2>
+                <p class="cg-tagline">Earn badges &nbsp;·&nbsp; Play games &nbsp;·&nbsp; Discover Borneo</p>
+                <div class="cg-stats">
+                    <div class="cg-stat">
+                        <span class="cg-stat-n">50+</span>
+                        <span class="cg-stat-l">Places</span>
+                    </div>
+                    <div class="cg-stat">
+                        <span class="cg-stat-n">5</span>
+                        <span class="cg-stat-l">Games</span>
+                    </div>
+                    <div class="cg-stat">
+                        <span class="cg-stat-n">0 sen</span>
+                        <span class="cg-stat-l">Cost</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -240,6 +250,12 @@
     <div class="cg-form-panel">
         <div class="cg-shimmer"></div>
         <div class="cg-form-inner">
+
+            <!-- MakauTech brand in form panel -->
+            <div class="cg-panel-brand">
+                <img src="/Images/icon.png" alt="MakauTech" />
+                <span class="cg-panel-brand-name">MakauTech</span>
+            </div>
 
             <a href="/" class="cg-back">
                 <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
