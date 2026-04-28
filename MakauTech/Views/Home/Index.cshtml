@@ -221,6 +221,69 @@
             filter: drop-shadow(0 4px 12px rgba(0,0,0,0.2));
         }
         .games-icons span:hover { transform: translateY(-3px) scale(1.08); }
+
+        .promo-video-wrap { max-width: 960px; margin: 0 auto; }
+        .promo-video-frame {
+            position: relative;
+            aspect-ratio: 16 / 9;
+            border-radius: var(--mk-r-xl);
+            overflow: hidden;
+            box-shadow: var(--mk-shadow-xl);
+            background: #0a1f12;
+        }
+        .promo-video-frame iframe {
+            position: absolute; inset: 0; width: 100%; height: 100%; border: 0;
+        }
+        .promo-video-placeholder {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: grid;
+            place-items: center;
+            cursor: not-allowed;
+        }
+        .promo-video-poster {
+            position: absolute; inset: 0;
+            width: 100%; height: 100%;
+            object-fit: cover;
+            opacity: 0.55;
+        }
+        .promo-video-btn {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            gap: 14px;
+            padding: 16px 30px;
+            background: rgba(255,255,255,0.92);
+            backdrop-filter: blur(8px);
+            color: var(--mk-emerald-700);
+            border: none;
+            border-radius: var(--mk-r-pill);
+            font-family: var(--mk-font-display);
+            font-size: 17px;
+            font-weight: 700;
+            letter-spacing: 0.01em;
+            box-shadow: 0 18px 42px rgba(0,0,0,0.35);
+            cursor: not-allowed;
+            opacity: 0.95;
+        }
+        .promo-video-btn[disabled] { opacity: 0.85; }
+        .promo-video-icon {
+            display: inline-grid;
+            place-items: center;
+            width: 38px; height: 38px;
+            background: var(--mk-grad-accent);
+            color: #fff;
+            border-radius: 50%;
+            font-size: 14px;
+            box-shadow: 0 4px 14px rgba(16,185,129,0.45);
+        }
+        .promo-video-caption {
+            text-align: center;
+            margin-top: 16px;
+            color: var(--mk-slate-600);
+            font-size: 14px;
+        }
     </style>
 }
 
@@ -264,6 +327,47 @@
         </div>
     </div>
 </section>
+
+@if (!loggedIn)
+{
+<!-- ============= PROMO VIDEO ============= -->
+<section class="mk-section" id="promo">
+    <div class="mk-section-head">
+        <div>
+            <div class="mk-section-kicker">🎬 Watch the trailer</div>
+            <h2 class="mk-section-title">Sibu in 60 seconds</h2>
+        </div>
+    </div>
+    <div class="promo-video-wrap">
+        <div class="promo-video-frame">
+            @* Replace YOUR_VIDEO_ID with the YouTube video id when ready, e.g. "dQw4w9WgXcQ" *@
+            @{
+                var promoId = ViewBag.PromoVideoId as string ?? "";
+            }
+            @if (!string.IsNullOrEmpty(promoId))
+            {
+                <iframe src="https://www.youtube.com/embed/@promoId?rel=0&modestbranding=1"
+                        title="MakauTech promo video"
+                        frameborder="0"
+                        loading="lazy"
+                        allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowfullscreen></iframe>
+            }
+            else
+            {
+                <div class="promo-video-placeholder">
+                    <img src="~/Images/Background.jpg" alt="" class="promo-video-poster" />
+                    <button type="button" class="promo-video-btn" aria-label="Promo video coming soon" disabled>
+                        <span class="promo-video-icon" aria-hidden="true">▶</span>
+                        <span>Promo video — coming soon</span>
+                    </button>
+                </div>
+            }
+        </div>
+        <p class="promo-video-caption">A walk through the Foochow heritage trail, river cruises, and rainforest escapes — all unlockable as quests.</p>
+    </div>
+</section>
+}
 
 <!-- ============= LATEST UPDATES STRIP ============= -->
 @{

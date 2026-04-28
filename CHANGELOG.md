@@ -8,6 +8,21 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ## [Unreleased]
 
+## [0.6.0] — 2026-04-28
+
+### Added
+- **Splash screen** — gaming-style boot animation (logo + segmented progress bar with shine sweep) shows once per browser session before first paint. Skippable on click; hard 4-second timeout.
+- **Promo video slot** on the home page (logged-out view), positioned right after the hero. Drops in any YouTube video by setting `ViewBag.PromoVideoId`. Falls back to a hero-image poster with a "coming soon" indicator.
+- **Sibu Events Calendar** (`/Home/Calendar`) — public month grid with prev/next navigation, today highlight, festival emoji on dated cells, and an "Upcoming events" sidebar. Curated list of Sarawak festivals, public holidays, and notable Sibu dates.
+- **Memory Flip game view** — a 4×4 card-flip memory game in the unified games theme. Includes 90-second timer, flip counter, mismatch detection, time + efficiency bonuses, anti-cheat scoring (server caps at 30 pts).
+- Open Graph and Twitter card meta tags so shared links show a hero preview on WhatsApp / Discord / Twitter.
+- README badges (.NET, ASP.NET MVC, Pomelo, status, changelog).
+
+### Fixed
+- **Memory game route was 404**. The controller existed but the view file was missing, so `/Memory` would not render. Game is now playable end-to-end.
+- **Quiz score had no server-side cap**. `SubmitScore` trusted `correctAnswers` from the client, multiplied by 3, and credited the points without bound — a forged request could mint unlimited points. Server now clamps to 0–10 correct answers and 0–30 points.
+- Various polish carried over from 0.5.
+
 ## [0.5.0] — 2026-04-28
 
 ### Added

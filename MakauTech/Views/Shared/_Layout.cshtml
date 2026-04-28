@@ -33,11 +33,70 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/polish.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/games.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/splash.css" asp-append-version="true" />
     @await RenderSectionAsync("Styles", required: false)
 </head>
 <body class="@(ViewBag.IsLoggedIn == true ? "has-sidebar" : "no-sidebar")">
     @* Antiforgery token rendered globally so AJAX endpoints (game submit, AI chat) can read it. *@
     @Html.AntiForgeryToken()
+
+    @* Splash / boot screen — once per session, on first visit. *@
+    <div id="mk-splash" role="status" aria-label="Loading MakauTech">
+        <div class="mk-splash-logo"><img src="~/Images/icon.png" alt="" /></div>
+        <div class="mk-splash-brand">
+            <div class="mk-splash-name"><span class="makau">Makau</span><span class="tech">Tech</span></div>
+            <div class="mk-splash-tag">Sibu · Sarawak · Borneo</div>
+        </div>
+        <div class="mk-splash-bar-wrap">
+            <div class="mk-splash-bar-track">
+                <div class="mk-splash-bar-fill" id="mk-splash-fill"></div>
+                <div class="mk-splash-bar-glow"></div>
+            </div>
+            <div class="mk-splash-meta">
+                <span class="label">Loading...</span>
+                <span class="pct" id="mk-splash-pct">0%</span>
+            </div>
+            <div class="mk-splash-tip">Press anywhere to skip</div>
+        </div>
+    </div>
+    <script>
+    (function () {
+        var splash = document.getElementById('mk-splash');
+        if (!splash) return;
+        try {
+            if (sessionStorage.getItem('mk-splash-shown')) {
+                splash.parentNode.removeChild(splash);
+                return;
+            }
+            sessionStorage.setItem('mk-splash-shown', '1');
+        } catch (e) { /* private mode — show splash anyway */ }
+
+        var fill = document.getElementById('mk-splash-fill');
+        var pct  = document.getElementById('mk-splash-pct');
+        var p = 0;
+        var done = false;
+        function close() {
+            if (done) return;
+            done = true;
+            splash.classList.add('is-leaving');
+            setTimeout(function () { if (splash.parentNode) splash.parentNode.removeChild(splash); }, 800);
+        }
+        function tick() {
+            if (done) return;
+            p += 4 + Math.random() * 7;
+            if (p >= 100) { p = 100; }
+            if (fill) fill.style.width = p + '%';
+            if (pct)  pct.textContent  = Math.floor(p) + '%';
+            if (p >= 100) { setTimeout(close, 300); return; }
+            setTimeout(tick, 70 + Math.random() * 60);
+        }
+        tick();
+        splash.addEventListener('click', close);
+        // Hard timeout — never block longer than 4s
+        setTimeout(close, 4000);
+    })();
+    </script>
+
     <div class="app-shell">
         @if (ViewBag.IsLoggedIn == true)
         {
@@ -57,6 +116,7 @@
                 <a class="sidebar-link @NavActive("Home", "Leaderboard")" asp-controller="Home" asp-action="Leaderboard">🏆 Leaderboard</a>
                 <a class="sidebar-link @NavActive("Home", "Achievements")" asp-controller="Home" asp-action="Achievements">🎖️ Achievements</a>
                 <a class="sidebar-link @NavActive("Home", "Map")" asp-controller="Home" asp-action="Map">🗺️ Live Map</a>
+                <a class="sidebar-link @NavActive("Home", "Calendar")" asp-controller="Home" asp-action="Calendar">📅 Calendar</a>
                 <a class="sidebar-link @NavActive("Home", "Updates")" asp-controller="Home" asp-action="Updates">📢 Updates</a>
                 <a class="sidebar-link @NavActive("Home", "About")" asp-controller="Home" asp-action="About">ℹ️ About</a>
                 <a class="sidebar-link @NavActive("Home", "Architecture")" asp-controller="Home" asp-action="Architecture">🏛️ Architecture</a>
