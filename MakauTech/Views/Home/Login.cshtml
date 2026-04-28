@@ -28,12 +28,7 @@
     background-size: cover;
     background-position: center 40%;
     filter: brightness(0.5) saturate(1.3);
-    animation: cg-drift 70s ease-in-out infinite alternate;
-    will-change: transform;
-}
-@@keyframes cg-drift {
-    from { transform: scale(1.01) translate(0, 0); }
-    to   { transform: scale(1.05) translate(-0.4%, -0.5%); }
+    /* static — no drift animation on auth pages */
 }
 .cg-overlay {
     position: absolute;
@@ -77,40 +72,16 @@
     height: 100%;
     display: flex;
     flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
     padding: 40px 48px;
 }
-/* logo top-left */
-.cg-logo {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    text-decoration: none;
-    width: fit-content;
-}
-.cg-logo-icon {
-    width: 42px; height: 42px;
-    border-radius: 11px;
-    background: rgba(255,255,255,0.15);
-    border: 1.5px solid rgba(255,255,255,0.28);
-    backdrop-filter: blur(10px);
-    display: grid; place-items: center;
-    font-size: 22px;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.3);
-}
-.cg-logo-name {
-    font-family: var(--mk-font-display, 'Fraunces', serif);
-    font-size: 20px;
-    font-weight: 800;
-    color: #fff;
-    letter-spacing: -0.02em;
-    text-shadow: 0 2px 8px rgba(0,0,0,0.4);
-}
-/* hero center — vertically centered in photo panel */
+/* hero center block */
 .cg-hero {
-    flex: 1;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    align-items: center;
 }
 /* live indicator */
 .cg-live {
@@ -190,6 +161,7 @@
     display: flex;
     gap: 28px;
     margin-bottom: 0;
+    justify-content: center;
 }
 .cg-stat {}
 .cg-stat-n {
@@ -435,12 +407,7 @@
             <div class="cg-dot"></div>
         </div>
         <div class="cg-visual-content">
-            <a href="/" class="cg-logo">
-                <div class="cg-logo-icon">🦢</div>
-                <span class="cg-logo-name">MakauTech</span>
-            </a>
-
-            <!-- hero block — centered vertically -->
+            <!-- hero block — centered -->
             <div class="cg-hero">
                 <span class="cg-live">Live · Sibu, Sarawak</span>
                 <p class="cg-coords">1.5555° N &nbsp;·&nbsp; 110.3333° E</p>

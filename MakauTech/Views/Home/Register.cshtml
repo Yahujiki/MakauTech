@@ -26,12 +26,7 @@
     background-size: cover;
     background-position: center 35%;
     filter: brightness(0.45) saturate(1.4);
-    animation: cg-drift 70s ease-in-out infinite alternate;
-    will-change: transform;
-}
-@@keyframes cg-drift {
-    from { transform: scale(1.01) translate(0, 0); }
-    to   { transform: scale(1.05) translate(-0.4%, -0.6%); }
+    /* static — no drift on auth pages */
 }
 .cg-overlay {
     position: absolute;
@@ -65,18 +60,13 @@
     height: 100%;
     display: flex;
     flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
     padding: 40px 48px;
 }
-.cg-logo { display:flex;align-items:center;gap:10px;text-decoration:none;width:fit-content; }
-.cg-logo-icon {
-    width:42px;height:42px;border-radius:11px;
-    background:rgba(255,255,255,0.15);border:1.5px solid rgba(255,255,255,0.28);
-    backdrop-filter:blur(10px);display:grid;place-items:center;font-size:22px;
-    box-shadow:0 4px 16px rgba(0,0,0,0.3);
-}
-.cg-logo-name { font-family:var(--mk-font-display,'Fraunces',serif);font-size:20px;font-weight:800;color:#fff;letter-spacing:-0.02em;text-shadow:0 2px 8px rgba(0,0,0,0.4); }
-/* hero center — vertically centered in the photo panel */
-.cg-hero { flex:1;display:flex;flex-direction:column;justify-content:center; }
+/* hero block — centered in photo panel */
+.cg-hero { display:flex;flex-direction:column;align-items:center; }
 .cg-live {
     display:inline-flex;align-items:center;gap:6px;
     background:rgba(52,211,153,0.14);border:1px solid rgba(52,211,153,0.3);
@@ -106,7 +96,7 @@
 .cg-city span { display:block;color:transparent;-webkit-text-stroke:1.5px rgba(255,255,255,0.35); }
 .cg-tagline { font-size:15px;color:rgba(255,255,255,0.5);letter-spacing:0.04em;margin:0 0 32px; }
 .cg-coords { font-family:'Courier New',monospace;font-size:11px;color:rgba(255,255,255,0.28);letter-spacing:0.1em;margin-bottom:8px; }
-.cg-stats { display:flex;gap:28px;margin-bottom:0; }
+.cg-stats { display:flex;gap:28px;margin-bottom:0;justify-content:center; }
 .cg-stat-n { font-family:var(--mk-font-display,'Fraunces',serif);font-size:28px;font-weight:900;color:#fff;line-height:1;display:block; }
 .cg-stat-l { font-size:10.5px;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:0.1em;margin-top:3px;display:block; }
 
@@ -214,12 +204,7 @@
             <div class="cg-dot"></div>
         </div>
         <div class="cg-visual-content">
-            <a href="/" class="cg-logo">
-                <div class="cg-logo-icon">🦢</div>
-                <span class="cg-logo-name">MakauTech</span>
-            </a>
-
-            <!-- hero block — centered vertically -->
+            <!-- hero block — centered -->
             <div class="cg-hero">
                 <span class="cg-live">Free · Always</span>
                 <p class="cg-coords">1.5555° N &nbsp;·&nbsp; 110.3333° E</p>
