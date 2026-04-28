@@ -276,6 +276,8 @@ CREATE TABLE IF NOT EXISTS `PlaceLikes` (
             if (HttpContext.Session.GetInt32("UserId") != null) return RedirectToAction("Index");
             ViewBag.HideAuthButtons = true;
             ViewBag.IsLoggedIn = false;
+            ViewBag.UserCount  = _context.Users.Count();
+            ViewBag.PlaceCount = _context.Places.Count();
             return View();
         }
 
@@ -364,6 +366,8 @@ CREATE TABLE IF NOT EXISTS `PlaceLikes` (
             if (HttpContext.Session.GetInt32("UserId") != null) return RedirectToAction("Index");
             ViewBag.HideAuthButtons = true;
             ViewBag.IsLoggedIn = false;
+            ViewBag.UserCount  = _context.Users.Count();
+            ViewBag.PlaceCount = _context.Places.Count();
             return View();
         }
 
