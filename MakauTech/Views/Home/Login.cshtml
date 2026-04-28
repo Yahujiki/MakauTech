@@ -18,49 +18,74 @@
     overflow: hidden;
 }
 
-/* photo layer */
+/* ── Full-screen Sibu background — JS controls transform ── */
 .cg-photo {
     position: absolute;
-    inset: 0;
+    inset: -4%;                /* bleed absorbs scale + parallax travel */
     background-image: url('/Images/rajang-river.jpg');
     background-size: cover;
-    background-position: center 40%;
-    filter: brightness(0.48) saturate(1.2);
+    background-position: 50% 40%;
+    filter: brightness(0.52) saturate(0.88) contrast(1.12) sepia(0.06);
+    will-change: transform;
+    transform-origin: center center;
 }
 
-/* dark gradient overlay */
+/* ── Cinematic overlay — bottom-weighted vignette ── */
 .cg-overlay {
     position: absolute;
     inset: 0;
     background:
-        linear-gradient(to bottom, rgba(6,20,12,0.55) 0%, rgba(0,0,0,0.30) 50%, rgba(6,20,12,0.65) 100%);
+        linear-gradient(to bottom,
+            rgba(2,8,4,0.52) 0%,
+            rgba(2,8,4,0.18) 30%,
+            rgba(2,8,4,0.12) 52%,
+            rgba(2,8,4,0.42) 75%,
+            rgba(2,8,4,0.82) 100%),
+        radial-gradient(ellipse 90% 70% at 50% 42%, transparent 25%, rgba(0,0,0,0.28) 100%);
 }
 
-/* SIBU text — stays in background, centred */
-.cg-bg-text {
-    position: absolute;
-    inset: 0;
+/* ── Brand + Card content stack (flex column, centred in the gate) ── */
+.cg-content-stack {
+    position: relative;
+    z-index: 10;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    pointer-events: none;
-    user-select: none;
-    z-index: 0;
+    padding: 28px 16px;
 }
-.cg-bg-city {
-    font-family: var(--mk-font-display, 'Fraunces', serif);
-    font-size: clamp(80px, 14vw, 160px);
-    font-weight: 900;
-    line-height: 0.88;
-    letter-spacing: -0.05em;
-    color: rgba(255,255,255,0.06);
+/* SIBU AWAITS — 1.2× card width (1.2 × 420px = 504px) */
+.cg-brand-header {
+    width: min(504px, 88vw);
     text-align: center;
+    margin-bottom: 40px;      /* spec: 32–48 px breathing gap to card */
 }
-.cg-bg-city span {
+.cg-bh-sibu {
     display: block;
-    -webkit-text-stroke: 1px rgba(255,255,255,0.08);
+    font-family: var(--mk-font-display, 'Fraunces', serif);
+    font-size: clamp(44px, 9vw, 80px);
+    font-weight: 900;
+    color: #ffffff;
+    letter-spacing: -0.04em;
+    line-height: 0.88;
+}
+.cg-bh-awaits {
+    display: block;
+    font-family: var(--mk-font-display, 'Fraunces', serif);
+    font-size: clamp(44px, 9vw, 80px);
+    font-weight: 900;
     color: transparent;
+    -webkit-text-stroke: 2px rgba(255,255,255,0.82);
+    letter-spacing: -0.04em;
+    line-height: 0.88;
+    margin-bottom: 16px;
+}
+.cg-bh-sub {
+    font-family: 'Inter', 'Montserrat', 'Segoe UI', sans-serif;
+    font-size: 10.5px;
+    letter-spacing: 0.10em;
+    color: rgba(255,255,255,0.70);
+    text-transform: uppercase;
+    margin: 0;
 }
 
 /* floating particles */
@@ -81,16 +106,14 @@
     100%{transform:translateY(-100vh) scale(0.5);opacity:0;}
 }
 
-/* ── Centre card ── */
+/* ── Centre card — frosted glass ── */
 .cg-card {
     position: relative;
-    z-index: 10;
     width: 100%;
     max-width: 420px;
-    margin: 0 16px;
     background: rgba(10,20,14,0.88);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     border: 1px solid rgba(52,211,153,0.18);
     border-radius: 22px;
     overflow: hidden;
@@ -305,12 +328,26 @@
 .cg-register a { color:#34d399;font-weight:700;text-decoration:none; }
 .cg-register a:hover { text-decoration:underline; }
 
-/* live badge on photo */
+/* ── Location header — now in document flow above brand text ── */
+.cg-location-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    pointer-events: none;
+    margin-bottom: 20px;
+}
+.cg-coords {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.22);
+    white-space: nowrap;
+}
+
+/* live badge (inside .cg-location-header) */
 .cg-live-badge {
-    position: absolute;
-    top: 28px; left: 50%;
-    transform: translateX(-50%);
-    z-index: 5;
     display: inline-flex;
     align-items: center;
     gap: 6px;
@@ -335,11 +372,71 @@
     50%{opacity:.5;box-shadow:0 0 0 4px rgba(52,211,153,0);}
 }
 
+/* ── Lateral depth columns ── */
+.cg-lateral-layer {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    display: flex;
+    align-items: stretch;
+    pointer-events: none;
+    user-select: none;
+}
+.cg-left-visual,
+.cg-right-visual {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+}
+/* Spacer reserves the card's footprint in the centre */
+.cg-lateral-spacer {
+    width: 470px;
+    flex-shrink: 0;
+}
+/* Blurred image planes — oversized so parallax shift never shows an edge */
+.cg-left-inner,
+.cg-right-inner {
+    position: absolute;
+    inset: -44px;
+    background-size: cover;
+    filter: blur(10px) saturate(0.7);
+    will-change: transform;
+    transition: transform 1.2s ease-out;
+}
+.cg-left-inner  {
+    background-image: url('/Images/sibu-lake-garden.jpg');
+    background-position: center 40%;
+}
+.cg-right-inner {
+    background-image: url('/Images/heritage-centre.jpg');
+    background-position: center 40%;
+}
+/* Inner-edge gradients fade each column toward the card */
+.cg-left-visual::after,
+.cg-right-visual::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+}
+.cg-left-visual::after  {
+    background: linear-gradient(to right, rgba(4,12,8,0.25) 0%, rgba(4,12,8,0.97) 100%);
+}
+.cg-right-visual::after {
+    background: linear-gradient(to left,  rgba(4,12,8,0.25) 0%, rgba(4,12,8,0.97) 100%);
+}
+@@media (max-width: 900px) {
+    .cg-lateral-layer { display: none; }
+}
+
 /* mobile */
 @@media (max-width: 500px) {
     .cg-card-inner { padding: 22px 22px 26px; }
     .cg-form-title { font-size: 22px; }
-    .cg-bg-city { font-size: 80px; }
+    .cg-content-stack { padding: 16px 12px; }
+    .cg-brand-header { margin-bottom: 24px; }
+    .cg-bh-sub { display: none; }
+    .cg-coords { display: none; }
 }
 @@supports (-webkit-touch-callout: none) {
     .city-gate { height: -webkit-fill-available; }
@@ -352,14 +449,6 @@
     <div class="cg-photo"></div>
     <div class="cg-overlay"></div>
 
-    <!-- giant watermark text (behind card) -->
-    <div class="cg-bg-text" aria-hidden="true">
-        <div class="cg-bg-city">
-            SIBU
-            <span>AWAITS</span>
-        </div>
-    </div>
-
     <!-- floating particles -->
     <div class="cg-particles">
         <div class="cg-dot"></div>
@@ -369,11 +458,17 @@
         <div class="cg-dot"></div>
     </div>
 
-    <!-- live badge top-center -->
-    <div class="cg-live-badge">Live · Sibu, Sarawak</div>
+    <!-- ═══ BRAND + CARD STACK ═══ -->
+    <div class="cg-content-stack">
 
-    <!-- ═══ CENTERED FORM CARD ═══ -->
-    <div class="cg-card">
+        <!-- SIBU AWAITS: filled + outlined typographic brand identity -->
+        <div class="cg-brand-header" aria-hidden="true">
+            <span class="cg-bh-sibu">SIBU</span>
+            <span class="cg-bh-awaits">AWAITS</span>
+            <p class="cg-bh-sub">Swan City &nbsp;•&nbsp; Foochow Heritage &nbsp;•&nbsp; Borneo</p>
+        </div>
+
+        <div class="cg-card">
         <div class="cg-shimmer"></div>
         <div class="cg-card-inner">
 
@@ -471,4 +566,52 @@
 
         </div>
     </div>
+
+    </div><!-- /.cg-content-stack -->
 </div>
+
+@section Scripts {
+<script>
+/* ══════════════════════════════════════════════════════════════════
+   MakauTech Login — Professional parallax engine
+   One rAF loop drives BOTH the slow breathing scale AND the
+   high-inertia mouse parallax on the background photo.
+   GPU-only path: transform only, no layout triggers.
+   ══════════════════════════════════════════════════════════════════ */
+(function () {
+    'use strict';
+
+    var photo = document.querySelector('.cg-photo');
+    if (!photo) return;
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    var mx = 0.5, my = 0.5;   /* normalised mouse position 0–1          */
+    var cx = 0,   cy = 0;     /* current smoothed translate (px)         */
+    var t  = 0;               /* time accumulator for breathe cycle      */
+
+    /* ── Unified animation loop ── */
+    (function loop() {
+        /* Slow breathe: scale oscillates 1.00 ↔ 1.04 over ~21 s */
+        t += 0.005;
+        var scale = (1.02 + Math.sin(t) * 0.02).toFixed(4);
+
+        /* High-inertia lerp toward mouse target (3% per frame ≈ 2 s to settle) */
+        var tx = (mx - 0.5) * -28;   /* ±14 px horizontal */
+        var ty = (my - 0.5) * -18;   /* ±9 px vertical    */
+        cx += (tx - cx) * 0.03;
+        cy += (ty - cy) * 0.03;
+
+        photo.style.transform =
+            'scale(' + scale + ') translate(' + cx.toFixed(2) + 'px,' + cy.toFixed(2) + 'px)';
+
+        requestAnimationFrame(loop);
+    }());
+
+    /* Mouse tracker — passive for scroll performance */
+    window.addEventListener('mousemove', function (e) {
+        mx = e.clientX / window.innerWidth;
+        my = e.clientY / window.innerHeight;
+    }, { passive: true });
+}());
+</script>
+}
