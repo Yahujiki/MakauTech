@@ -44,3 +44,8 @@ Thumbs.db
 *.pdf
 *.docx
 *.xlsx
+
+# Local helper scripts (ERD/PPTX/DOCX generators, screenshot exporters)
+make_*.py
+export_*.py
+read_*.py

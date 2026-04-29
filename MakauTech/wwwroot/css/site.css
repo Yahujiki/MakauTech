@@ -20,17 +20,19 @@
     --sidebar-gradient: linear-gradient(175deg, #071d0f 0%, #0b2e18 45%, #0d3a1e 100%);
 }
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; }
-body { font-family: 'Plus Jakarta Sans', 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; font-size: 16px; min-height: 100vh; }
+html { scroll-behavior: smooth; overflow-x: hidden; }
+body { font-family: 'Plus Jakarta Sans', 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; font-size: 16px; min-height: 100vh; min-height: 100dvh; overflow-x: hidden; }
 a { text-decoration: none; color: inherit; }
 img { max-width: 100%; display: block; }
 
 /* === APP SHELL + SIDEBAR (MakauTech) === */
-.app-shell { display: flex; min-height: 100vh; }
+.app-shell { display: flex; min-height: 100vh; min-height: 100dvh; width: 100%; overflow-x: clip; }
+.app-main { width: 100%; }
 .sidebar {
     width: 272px; flex-shrink: 0; background: var(--sidebar-gradient);
     color: var(--text-white); display: flex; flex-direction: column;
-    position: sticky; top: 0; align-self: flex-start; height: 100vh; overflow-y: auto;
+    /* Fixed — always covers full viewport height, no scroll gap */
+    position: fixed; top: 0; left: 0; height: 100vh; overflow-y: auto;
     z-index: 300; box-shadow: 6px 0 32px rgba(0,0,0,0.25);
     border-right: 1px solid rgba(34,197,94,0.12);
 }
@@ -77,6 +79,8 @@ img { max-width: 100%; display: block; }
 }
 body.sidebar-open .sidebar-backdrop { display: block; }
 .app-main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+/* Offset main content so it never hides behind the fixed sidebar */
+body.has-sidebar .app-main { margin-left: 272px; }
 .topbar {
     display: flex; align-items: center; gap: 0.75rem; padding: 0.65rem 1rem;
     background: var(--sidebar-gradient); color: #fff; position: sticky; top: 0; z-index: 200; box-shadow: 0 2px 16px rgba(0,0,0,0.3);
@@ -172,6 +176,8 @@ body.no-sidebar .main-content { padding: 0; }
         position: fixed; left: 0; top: 0; transform: translateX(-105%); transition: transform 0.28s ease;
         box-shadow: none; width: min(300px, 88vw);
     }
+    /* Remove the desktop offset on mobile — sidebar slides in as overlay */
+    body.has-sidebar .app-main { margin-left: 0; }
     body.sidebar-open { overflow: hidden; }
     body.sidebar-open .sidebar { transform: translateX(0); box-shadow: 8px 0 40px rgba(0,0,0,0.25); }
     .sidebar-close { display: block; }

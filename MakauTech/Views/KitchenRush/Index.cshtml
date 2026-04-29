@@ -19,6 +19,7 @@ body { background: #030d06 !important; }
         <div class="kr-hero-icon">🍳</div>
         <h1 class="kr-hero-title">Kitchen Rush</h1>
         <p class="kr-hero-sub">Memorise the dish order — tap the right ingredient before time runs out!</p>
+        <p style="opacity:0.85;font-size:0.92rem;color:rgba(226,232,240,0.75);margin:0;">🎲 <strong>Quick fun:</strong> Orders get trickier round by round — stay calm when the timer flashes red!</p>
         <div class="kr-hero-tags">
             <span class="kr-tag kr-tag-free">🪙 @krCost pts to play</span>
             <span class="kr-tag kr-tag-speed">⚡ Speed Challenge</span>
@@ -297,7 +298,7 @@ body { background: #030d06 !important; }
         ptsEl.textContent = '';
 
         if (score > 0) {
-            fetch('/KitchenRush/SubmitScore', {
+            ((window.MakauSecurity && MakauSecurity.csrfFetch) ? MakauSecurity.csrfFetch : fetch)('/KitchenRush/SubmitScore', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ score: score })
@@ -359,7 +360,7 @@ body { background: #030d06 !important; }
     document.getElementById('krBtnPay').addEventListener('click', function(){
         const btn = this;
         btn.disabled = true; btn.textContent = '⏳ Processing...';
-        fetch('/KitchenRush/PayToPlay', { method: 'POST' })
+        ((window.MakauSecurity && MakauSecurity.csrfFetch) ? MakauSecurity.csrfFetch : fetch)('/KitchenRush/PayToPlay', { method: 'POST' })
             .then(r => r.json()).then(d => {
                 if (d.success) {
                     krBalance = d.remainingPoints;

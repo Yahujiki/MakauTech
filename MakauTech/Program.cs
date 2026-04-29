@@ -25,23 +25,39 @@ builder.Services.AddDbContext<MakauTechDbContext>(options =>
             maxRetryDelay: TimeSpan.FromSeconds(10),
             errorNumbersToAdd: null)));
 
+// Zero-trust cookie posture.
+// __Host- prefix is the strongest cookie pinning the platform offers:
+//   * forces Secure
+//   * forces Path=/
+//   * forbids Domain attribute (no subdomain bleed)
+// Combined with HttpOnly + SameSite=Strict this neutralises XSS exfiltration,
+// CSRF cross-origin replay, and subdomain cookie-injection attacks.
+// Dev (HTTP) gracefully falls back to a non-prefixed name so localhost still works.
+var isProd = !builder.Environment.IsDevelopment();
+var sessionCookieName    = isProd ? "__Host-MakauTech.Sid"  : ".MakauTech.Session";
+var antiforgeryCookieName = isProd ? "__Host-MakauTech.Csrf" : ".MakauTech.Csrf";
+
 builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.Cookie.Name = sessionCookieName;
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
     options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
     options.Cookie.SameSite = SameSiteMode.Strict;
-    options.Cookie.Name = ".MakauTech.Session";
+    options.Cookie.Path = "/";
 });
 builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddAntiforgery(options =>
 {
     options.HeaderName = "X-CSRF-TOKEN";
+    options.Cookie.Name = antiforgeryCookieName;
     options.Cookie.HttpOnly = true;
     options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
     options.Cookie.SameSite = SameSiteMode.Strict;
+    options.Cookie.Path = "/";
+    options.SuppressXFrameOptionsHeader = false;
 });
 
 // Brute-force + abuse protection
@@ -122,6 +138,9 @@ using (var scope = app.Services.CreateScope())
         "ALTER TABLE `Users` ADD COLUMN `FailedLoginAttempts` INT NOT NULL DEFAULT 0",
         "ALTER TABLE `Users` ADD COLUMN `LockedUntil` DATETIME NULL",
         "ALTER TABLE `Users` ADD COLUMN `LastLoginAt` DATETIME NULL",
+        "ALTER TABLE `Users` ADD COLUMN `UiTutorialSeen` TINYINT(1) NOT NULL DEFAULT 0",
+        "ALTER TABLE `Users` ADD COLUMN `TermsVersionAccepted` VARCHAR(40) NOT NULL DEFAULT ''",
+        "ALTER TABLE `Users` ADD COLUMN `TermsAcceptedAt` DATETIME NULL",
     ];
     foreach (var sql in alterStatements)
     {

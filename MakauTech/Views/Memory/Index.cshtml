@@ -84,6 +84,8 @@
         </div>
     </div>
 
+    <div class="game-fun-mini" role="note" style="max-width:620px;"><b>Flip smart:</b> Try to memorise landmark pairs in two clicks — mismatches hurt your accuracy bonus, gold matches 💛 shimmer on a perfect streak.</div>
+
     @* PAY SCREEN *@
     <div id="memPayScreen" class="gm-card">
         <h2>Ready to flip?</h2>
@@ -252,9 +254,9 @@
         document.getElementById('memResultScore').textContent = '+' + score + ' pts';
 
         try {
-            fetch('/Memory/SubmitScore', {
+            ((window.MakauSecurity && MakauSecurity.csrfFetch) ? MakauSecurity.csrfFetch : fetch)('/Memory/SubmitScore', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'RequestVerificationToken': csrf(), 'X-CSRF-TOKEN': csrf() },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ Score: score })
             });
         } catch (_) {}
@@ -277,10 +279,7 @@
     btnPay.addEventListener('click', function () {
         btnPay.disabled = true;
         btnPay.textContent = 'Loading...';
-        fetch('/Memory/PayToPlay', {
-            method: 'POST',
-            headers: { 'RequestVerificationToken': csrf(), 'X-CSRF-TOKEN': csrf() }
-        })
+        ((window.MakauSecurity && MakauSecurity.csrfFetch) ? MakauSecurity.csrfFetch : fetch)('/Memory/PayToPlay', { method: 'POST' })
             .then(function (r) { return r.json(); })
             .then(function (data) {
                 if (!data.success) {

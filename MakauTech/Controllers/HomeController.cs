@@ -25,6 +25,15 @@ namespace MakauTech.Controllers
             return _context.Users.FirstOrDefault(u => u.Id == userId);
         }
 
+        private void QueuePostLoginTutorialIfNeeded(User user)
+        {
+            if (user is Admin) return;
+
+            TempData["PostLoginPixel"] = true;
+            if (!user.UiTutorialSeen)
+                HttpContext.Session.SetString("mk-show-tutorial", "pending");
+        }
+
         private string? GetAvatarPublicPath(int userId)
         {
             foreach (var ext in new[] { ".jpg", ".jpeg", ".png", ".webp", ".gif" })
@@ -51,6 +60,9 @@ namespace MakauTech.Controllers
             try
             {
                 SetViewBagUser();
+                if (TempData["PostLoginPixel"] != null)
+                    ViewBag.PostLoginPixel = true;
+
                 DbSeeder.EnsureMinimumTourismData(_context);
                 EnsureWismaSanyan();
                 EnsurePlaceLikesTable();
@@ -327,10 +339,22 @@ CREATE TABLE IF NOT EXISTS `PlaceLikes` (
 
                 user.RecordSuccessfulLogin();
                 MigratePasswordIfNeeded(user, model.Password);
+
+                // Auto-accept current Terms version on successful login —
+                // user already ticked the agreement checkbox on the login form,
+                // so no need to show a second post-login modal.
+                const string currentTermsVersionAtLogin = "2026-04";
+                if (user.TermsVersionAccepted != currentTermsVersionAtLogin)
+                {
+                    user.TermsVersionAccepted = currentTermsVersionAtLogin;
+                    user.TermsAcceptedAt = DateTime.UtcNow;
+                }
+
                 _context.SaveChanges();
 
                 HttpContext.Session.SetInt32("UserId", user.Id);
                 HttpContext.Session.SetString("UserName", user.Name);
+                QueuePostLoginTutorialIfNeeded(user);
                 if (user is Admin) return RedirectToAction("Dashboard", "Admin");
                 return RedirectToAction("Index");
             }
@@ -394,7 +418,17 @@ CREATE TABLE IF NOT EXISTS `PlaceLikes` (
                 }
 
                 var hashedPassword = BCrypt.Net.BCrypt.HashPassword(model.Password, workFactor: 12);
-                var user = new User { Name = model.Name.Trim(), Email = model.Email.Trim().ToLowerInvariant(), Password = hashedPassword };
+                // User already ticked the Terms & Privacy checkbox on the register form,
+                // so we record acceptance directly — no second modal needed after sign-in.
+                const string currentTermsVersionAtRegister = "2026-04";
+                var user = new User
+                {
+                    Name = model.Name.Trim(),
+                    Email = model.Email.Trim().ToLowerInvariant(),
+                    Password = hashedPassword,
+                    TermsVersionAccepted = currentTermsVersionAtRegister,
+                    TermsAcceptedAt = DateTime.UtcNow
+                };
                 _context.Users.Add(user);
                 _context.SaveChanges();
                 HttpContext.Session.SetInt32("UserId", user.Id);
@@ -431,7 +465,41 @@ CREATE TABLE IF NOT EXISTS `PlaceLikes` (
             user.Interests = interests ?? new List<string>();
             user.IsOnboarded = true;
             _context.SaveChanges();
+            QueuePostLoginTutorialIfNeeded(user);
             return RedirectToAction("Index");
+        }
+
+        /// <summary>Marks UI walkthrough completed (persisted). Called from wizard JS.</summary>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult DismissTutorial()
+        {
+            var user = GetCurrentUser();
+            if (user != null && !user.UiTutorialSeen)
+            {
+                user.UiTutorialSeen = true;
+                _context.SaveChanges();
+            }
+            HttpContext.Session.Remove("mk-show-tutorial");
+            return Json(new { ok = true });
+        }
+
+        /// <summary>Accepts the platform Terms & Privacy agreement (required after login).</summary>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult AcceptAgreement()
+        {
+            var user = GetCurrentUser();
+            if (user == null) return Unauthorized();
+
+            const string currentTermsVersion = "2026-04";
+            if (user.TermsVersionAccepted != currentTermsVersion)
+            {
+                user.TermsVersionAccepted = currentTermsVersion;
+                user.TermsAcceptedAt = DateTime.UtcNow;
+                _context.SaveChanges();
+            }
+            return Json(new { ok = true, version = currentTermsVersion });
         }
 
         public IActionResult Logout()
