@@ -58,8 +58,9 @@ img { max-width: 100%; display: block; }
     transition: background 0.2s, transform 0.18s, box-shadow 0.2s; border-left: 3px solid transparent;
     position: relative; overflow: hidden;
 }
-.sidebar-link:hover { background: rgba(34,197,94,0.12); color: #fff !important; transform: translateX(3px); box-shadow: inset 0 0 20px rgba(34,197,94,0.06); }
-.sidebar-link--active { background: linear-gradient(90deg, rgba(34,197,94,0.22) 0%, rgba(34,197,94,0.06) 100%); border-left-color: var(--accent); color: #fff !important; box-shadow: 0 0 12px rgba(34,197,94,0.2); }
+.sidebar-link:hover { background: rgba(34,197,94,0.10); color: #fff !important; transform: translateX(2px); box-shadow: inset 0 0 0 1px rgba(34,197,94,0.18); }
+/* Note: real ".sidebar-link--active" rules live in the LEGENDARY LAYER below
+   (clean Linear/Vercel-style chip, no gradient bloom). */
 .sidebar-bottom { padding: 1rem; border-top: 1px solid rgba(255,255,255,0.12); display: flex; flex-direction: column; gap: 0.5rem; }
 .sidebar-profile {
     display: flex; flex-direction: column; gap: 0.2rem; padding: 0.7rem 0.85rem; border-radius: 12px;
@@ -740,25 +741,69 @@ body.no-sidebar .main-content { padding: 0; }
    LEGENDARY LAYER — godmode UI upgrades
    ============================================================ */
 
-/* --- Sidebar neon active glow --- */
+/* ════════════════════════════════════════════════════════════════════════
+   SIDEBAR — RARE / PREMIUM ACTIVE STATE  (Figma-grade, no gradient bloom)
+   Style references: Linear app · Vercel dashboard · Steam library
+   Layered approach:
+     1. Solid emerald base with subtle inner sheen
+     2. Crisp 1px outer hairline (depth without glow)
+     3. Left rail = solid bar + tiny rounded cap (the "rare" indicator)
+     4. Right side = numeric/dot accent (status pip)
+     5. Letter-spacing tightening on text for editorial weight
+   ════════════════════════════════════════════════════════════════════════ */
+
 .sidebar-link--active {
-    background: linear-gradient(90deg, rgba(34,197,94,0.28) 0%, rgba(34,197,94,0.07) 100%) !important;
-    border-left-color: #4ade80 !important;
-    color: #fff !important;
-    box-shadow: 0 0 18px rgba(74,222,128,0.22), inset 0 0 24px rgba(34,197,94,0.08) !important;
+    /* Solid emerald — NO gradient bloom. Looks like a real selected chip. */
+    background: #0f3a26 !important;
+    color: #ffffff !important;
+    font-weight: 700 !important;
+    letter-spacing: -0.005em;
+    border: 1px solid rgba(110, 231, 183, 0.28) !important;
+    border-left: 0 !important;        /* we replace the rail with a custom one */
+    border-radius: 12px;
+
+    /* Multi-layer depth — clean & sharp, not "AI glowy" */
+    box-shadow:
+        inset 0  1px 0 rgba(255, 255, 255, 0.08),       /* top sheen */
+        inset 0 -1px 0 rgba(0, 0, 0, 0.25),             /* bottom shadow */
+        inset 6px 0 0 #6ee7b7,                          /* solid left rail */
+        0 1px 0 rgba(0, 0, 0, 0.35),                    /* outer drop */
+        0 0 0 1px rgba(16, 185, 129, 0.06) !important;  /* hairline */
+    transform: translateX(0) !important;
+    position: relative;
+    overflow: visible !important;
 }
+
+/* Left rail end-caps — gives the bar a "tab" feel like Linear/Vercel */
 .sidebar-link--active::before {
     content: '';
     position: absolute;
-    left: 0; top: 0; bottom: 0;
-    width: 3px;
-    background: linear-gradient(180deg, #4ade80, #22c55e, #86efac);
-    border-radius: 0 2px 2px 0;
-    box-shadow: 0 0 12px #4ade80;
+    left: 0; top: 50%;
+    width: 6px; height: 22px;
+    transform: translateY(-50%);
+    background: #6ee7b7;
+    border-radius: 0 4px 4px 0;
+    box-shadow: 0 0 0 1px rgba(110, 231, 183, 0.35);
+    z-index: 2;
 }
-@keyframes sidebar-link-pulse {
-    0%,100% { box-shadow: 0 0 18px rgba(74,222,128,0.22), inset 0 0 24px rgba(34,197,94,0.08); }
-    50% { box-shadow: 0 0 28px rgba(74,222,128,0.38), inset 0 0 32px rgba(34,197,94,0.14); }
+
+/* Right-side status pip — the small touch that says "premium / rare" */
+.sidebar-link--active::after {
+    content: '';
+    position: absolute;
+    right: 14px; top: 50%;
+    width: 6px; height: 6px;
+    transform: translateY(-50%);
+    background: #6ee7b7;
+    border-radius: 50%;
+    box-shadow:
+        0 0 0 2px rgba(110, 231, 183, 0.2),
+        0 0 8px rgba(110, 231, 183, 0.55);
+    animation: sidebar-pip 2.4s ease-in-out infinite;
+}
+@keyframes sidebar-pip {
+    0%, 100% { opacity: 0.95; transform: translateY(-50%) scale(1); }
+    50%      { opacity: 0.55; transform: translateY(-50%) scale(0.85); }
 }
 
 /* --- Shimmer CTA buttons --- */

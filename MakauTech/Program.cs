@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.RateLimiting;
 using System.Threading.RateLimiting;
 using MakauTech.Data;
 using MakauTech.Hubs;
+using MakauTech.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -110,6 +111,15 @@ builder.Services.AddRateLimiter(options =>
     });
 });
 
+// ─── Brevo transactional email (sender: noreply@makautech.com) ────────────
+// API key comes from User Secrets (dev) or environment variable BREVO__APIKEY (prod).
+// Never commit the key to git.
+builder.Services.Configure<BrevoOptions>(builder.Configuration.GetSection("Brevo"));
+builder.Services.AddHttpClient<IEmailService, BrevoEmailService>(client =>
+{
+    client.Timeout = TimeSpan.FromSeconds(15);
+});
+
 if (!builder.Environment.IsDevelopment())
 {
     builder.Services.AddHsts(options =>
@@ -141,6 +151,8 @@ using (var scope = app.Services.CreateScope())
         "ALTER TABLE `Users` ADD COLUMN `UiTutorialSeen` TINYINT(1) NOT NULL DEFAULT 0",
         "ALTER TABLE `Users` ADD COLUMN `TermsVersionAccepted` VARCHAR(40) NOT NULL DEFAULT ''",
         "ALTER TABLE `Users` ADD COLUMN `TermsAcceptedAt` DATETIME NULL",
+        "ALTER TABLE `Users` ADD COLUMN `PasswordResetToken` VARCHAR(128) NULL",
+        "ALTER TABLE `Users` ADD COLUMN `PasswordResetTokenExpires` DATETIME NULL",
     ];
     foreach (var sql in alterStatements)
     {

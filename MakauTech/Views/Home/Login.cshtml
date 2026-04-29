@@ -318,6 +318,21 @@
 .cg-submit svg { width:15px;height:15px;transition:transform 0.2s; }
 .cg-submit:hover svg { transform:translateX(4px); }
 
+/* ── Forgot password link ── */
+.cg-forgot-row {
+    display: flex;
+    justify-content: flex-end;
+    margin: -10px 0 18px;
+}
+.cg-forgot-link {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: rgba(52,211,153,0.85);
+    text-decoration: none;
+    transition: color 0.18s;
+}
+.cg-forgot-link:hover { color: #6ee7b7; text-decoration: underline; }
+
 /* ── Agreement checkbox ── */
 .cg-agree-row {
     margin-bottom: 20px;
@@ -539,6 +554,15 @@
                     <span>@TempData["LoginError"]</span>
                 </div>
             }
+            @if (TempData["LoginNotice"] != null)
+            {
+                <div class="cg-alert" role="status" style="background:rgba(16,185,129,0.10);border-color:rgba(16,185,129,0.32);color:#6ee7b7;">
+                    <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" style="flex-shrink:0;margin-top:1px">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <span>@TempData["LoginNotice"]</span>
+                </div>
+            }
             @if (ViewBag.Error != null)
             {
                 <div class="cg-alert" role="alert">
@@ -591,6 +615,11 @@
                         <div class="cg-field-line"></div>
                     </div>
                     <div id="loginPasswordErr" class="mk-fielderror" role="alert" aria-live="polite"></div>
+                </div>
+
+                <!-- Forgot password link — small, right-aligned above agreement -->
+                <div class="cg-forgot-row">
+                    <a asp-action="ForgotPassword" class="cg-forgot-link">Forgot password?</a>
                 </div>
 
                 <!-- Agreement — must tick before entering -->

@@ -31,6 +31,32 @@ namespace MakauTech.Models
         public string Password { get; set; } = string.Empty;
     }
 
+    public class ForgotPasswordViewModel
+    {
+        [Required(ErrorMessage = "Email is required.")]
+        [EmailAddress(ErrorMessage = "Invalid email address.")]
+        [StringLength(256)]
+        public string Email { get; set; } = string.Empty;
+    }
+
+    public class ResetPasswordViewModel
+    {
+        [Required]
+        [EmailAddress]
+        public string Email { get; set; } = string.Empty;
+
+        [Required]
+        public string Token { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "New password is required.")]
+        [StringLength(128, MinimumLength = 6, ErrorMessage = "Password must be 6–128 characters.")]
+        public string NewPassword { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Please confirm your new password.")]
+        [Compare(nameof(NewPassword), ErrorMessage = "Passwords do not match.")]
+        public string ConfirmPassword { get; set; } = string.Empty;
+    }
+
     public class HomeViewModel
     {
         public List<Place> Places { get; set; } = new();

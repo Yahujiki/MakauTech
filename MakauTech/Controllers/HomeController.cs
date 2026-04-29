@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using MakauTech.Data;
 using MakauTech.Helpers;
 using MakauTech.Models;
+using MakauTech.Services;
 
 namespace MakauTech.Controllers
 {
@@ -11,11 +12,28 @@ namespace MakauTech.Controllers
     {
         private readonly MakauTechDbContext _context;
         private readonly IWebHostEnvironment _env;
+        private readonly IEmailService _email;
+        private readonly ILogger<HomeController> _logger;
 
-        public HomeController(MakauTechDbContext context, IWebHostEnvironment env)
+        public HomeController(
+            MakauTechDbContext context,
+            IWebHostEnvironment env,
+            IEmailService email,
+            ILogger<HomeController> logger)
         {
             _context = context;
             _env = env;
+            _email = email;
+            _logger = logger;
+        }
+
+        /// <summary>Cryptographically-strong URL-safe token for email password resets.</summary>
+        private static string GenerateSecureToken()
+        {
+            var bytes = new byte[32]; // 256 bits
+            System.Security.Cryptography.RandomNumberGenerator.Fill(bytes);
+            return Convert.ToBase64String(bytes)
+                .Replace('+', '-').Replace('/', '_').TrimEnd('=');
         }
 
         private User? GetCurrentUser()
@@ -431,6 +449,16 @@ CREATE TABLE IF NOT EXISTS `PlaceLikes` (
                 };
                 _context.Users.Add(user);
                 _context.SaveChanges();
+
+                // Fire-and-forget welcome email — never block the registration UX
+                // if the email provider is slow or rate-limited.
+                _ = _email.SendWelcomeEmailAsync(user)
+                    .ContinueWith(t =>
+                    {
+                        if (t.Exception != null)
+                            _logger.LogWarning(t.Exception, "Welcome email background task failed for {Email}", user.Email);
+                    }, TaskScheduler.Default);
+
                 HttpContext.Session.SetInt32("UserId", user.Id);
                 HttpContext.Session.SetString("UserName", user.Name);
                 return RedirectToAction("Onboarding");
@@ -442,6 +470,149 @@ CREATE TABLE IF NOT EXISTS `PlaceLikes` (
                 ViewBag.IsLoggedIn = false;
                 return View(model);
             }
+        }
+
+        // ─── Forgot / Reset password flow ──────────────────────────────────
+
+        public IActionResult ForgotPassword()
+        {
+            if (HttpContext.Session.GetInt32("UserId") != null) return RedirectToAction("Index");
+            ViewBag.HideAuthButtons = true;
+            ViewBag.IsLoggedIn = false;
+            return View(new ForgotPasswordViewModel());
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Microsoft.AspNetCore.RateLimiting.EnableRateLimiting("login")]
+        public IActionResult ForgotPassword(ForgotPasswordViewModel model)
+        {
+            ViewBag.HideAuthButtons = true;
+            ViewBag.IsLoggedIn = false;
+
+            if (!ModelState.IsValid) return View(model);
+
+            try
+            {
+                var email = model.Email.Trim().ToLowerInvariant();
+                var user = _context.Users.FirstOrDefault(u => u.Email == email);
+
+                // Generate token + send email only when user exists.
+                // BUT we always show the same confirmation page to prevent
+                // attackers from enumerating which emails are registered.
+                if (user != null)
+                {
+                    var token = GenerateSecureToken();
+                    user.PasswordResetToken = token;
+                    user.PasswordResetTokenExpires = DateTime.UtcNow.AddHours(1);
+                    _context.SaveChanges();
+
+                    var resetLink = Url.Action(
+                        "ResetPassword", "Home",
+                        new { email = user.Email, token = token },
+                        protocol: Request.Scheme,
+                        host: Request.Host.Value)!;
+
+                    _ = _email.SendPasswordResetEmailAsync(user, resetLink)
+                        .ContinueWith(t =>
+                        {
+                            if (t.Exception != null)
+                                _logger.LogWarning(t.Exception, "Password reset email failed for {Email}", user.Email);
+                        }, TaskScheduler.Default);
+                }
+                else
+                {
+                    _logger.LogInformation("Password reset requested for unknown email {Email}", email);
+                }
+
+                ViewBag.Sent = true;
+                return View(new ForgotPasswordViewModel { Email = model.Email });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "ForgotPassword failed for {Email}", model.Email);
+                ViewBag.Error = "Could not process the request. Please try again later.";
+                return View(model);
+            }
+        }
+
+        public IActionResult ResetPassword(string? email, string? token)
+        {
+            if (HttpContext.Session.GetInt32("UserId") != null) return RedirectToAction("Index");
+            ViewBag.HideAuthButtons = true;
+            ViewBag.IsLoggedIn = false;
+
+            if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(token))
+            {
+                ViewBag.Error = "Invalid reset link.";
+                return View(new ResetPasswordViewModel());
+            }
+
+            var normalised = email.Trim().ToLowerInvariant();
+            var user = _context.Users.FirstOrDefault(u => u.Email == normalised);
+            if (user == null
+                || string.IsNullOrEmpty(user.PasswordResetToken)
+                || !CryptographicEquals(user.PasswordResetToken, token)
+                || user.PasswordResetTokenExpires == null
+                || user.PasswordResetTokenExpires.Value < DateTime.UtcNow)
+            {
+                ViewBag.Error = "This reset link is invalid or has expired. Please request a new one.";
+                return View(new ResetPasswordViewModel());
+            }
+
+            return View(new ResetPasswordViewModel { Email = normalised, Token = token });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Microsoft.AspNetCore.RateLimiting.EnableRateLimiting("login")]
+        public IActionResult ResetPassword(ResetPasswordViewModel model)
+        {
+            ViewBag.HideAuthButtons = true;
+            ViewBag.IsLoggedIn = false;
+
+            if (!ModelState.IsValid) return View(model);
+
+            try
+            {
+                var normalised = model.Email.Trim().ToLowerInvariant();
+                var user = _context.Users.FirstOrDefault(u => u.Email == normalised);
+                if (user == null
+                    || string.IsNullOrEmpty(user.PasswordResetToken)
+                    || !CryptographicEquals(user.PasswordResetToken, model.Token)
+                    || user.PasswordResetTokenExpires == null
+                    || user.PasswordResetTokenExpires.Value < DateTime.UtcNow)
+                {
+                    ViewBag.Error = "This reset link is invalid or has expired. Please request a new one.";
+                    return View(model);
+                }
+
+                // Hash + persist new password, invalidate token, reset lockout state.
+                user.Password = BCrypt.Net.BCrypt.HashPassword(model.NewPassword, workFactor: 12);
+                user.PasswordResetToken = null;
+                user.PasswordResetTokenExpires = null;
+                user.RecordSuccessfulLogin(); // clears FailedLoginAttempts + LockedUntil
+                _context.SaveChanges();
+
+                TempData["LoginNotice"] = "Your password has been reset. Please sign in with the new password.";
+                return RedirectToAction("Login");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "ResetPassword failed for {Email}", model.Email);
+                ViewBag.Error = "Could not reset the password. Please try again.";
+                return View(model);
+            }
+        }
+
+        /// <summary>Constant-time string comparison to prevent timing-attack token leaks.</summary>
+        private static bool CryptographicEquals(string a, string b)
+        {
+            if (a == null || b == null) return false;
+            if (a.Length != b.Length) return false;
+            int diff = 0;
+            for (int i = 0; i < a.Length; i++) diff |= a[i] ^ b[i];
+            return diff == 0;
         }
 
         public IActionResult Onboarding()

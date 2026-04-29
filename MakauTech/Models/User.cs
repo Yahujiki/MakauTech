@@ -25,6 +25,10 @@
         public DateTime? LockedUntil { get; set; }
         public DateTime? LastLoginAt { get; set; }
 
+        // Password reset (set when user requests "forgot password", cleared on use)
+        public string? PasswordResetToken { get; set; }
+        public DateTime? PasswordResetTokenExpires { get; set; }
+
         public string Level
         {
             get
