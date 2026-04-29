@@ -46,6 +46,7 @@ namespace MakauTech.Controllers
             ViewBag.UserLevel = user?.Level ?? "";
         }
 
+
         private void EnsurePlaceLikesTable()
         {
             try

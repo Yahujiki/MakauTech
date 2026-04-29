@@ -1,7 +1,27 @@
-﻿@{
+﻿@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
+@inject MakauTech.Data.MakauTechDbContext MkDbCtx
+@{
     var ctrl = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
     var act = ViewContext.RouteData.Values["action"]?.ToString() ?? "";
     string NavActive(string c, string a) => ctrl.Equals(c, StringComparison.OrdinalIgnoreCase) && act.Equals(a, StringComparison.OrdinalIgnoreCase) ? "sidebar-link--active" : "";
+    // Issue + persist the antiforgery token cookie (HttpOnly, __Host-, SameSite=Strict).
+    // The header half is exposed to JS via <meta> below — the cookie half stays HttpOnly.
+    var csrfTokens = Antiforgery.GetAndStoreTokens(Context);
+
+    const string mkTermsVersion = "2026-04";
+    bool mkShouldShowUiTutorial = false;
+    bool mkNeedsAgreement = false;
+    var mkUid = Context.Session.GetInt32("UserId");
+    if (mkUid.HasValue && Context.Session.GetString("mk-show-tutorial") == "pending")
+    {
+        var mkUser = MkDbCtx.Users.AsNoTracking().FirstOrDefault(u => u.Id == mkUid.Value);
+        mkShouldShowUiTutorial = mkUser != null && !mkUser.UiTutorialSeen;
+    }
+    if (mkUid.HasValue)
+    {
+        var mkUser = MkDbCtx.Users.AsNoTracking().FirstOrDefault(u => u.Id == mkUid.Value);
+        mkNeedsAgreement = mkUser != null && mkUser.TermsVersionAccepted != mkTermsVersion;
+    }
 }
 <!DOCTYPE html>
 <html lang="en" id="htmlRoot">
@@ -12,6 +32,9 @@
 </script>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    @* Antiforgery header value — cookie half is HttpOnly + __Host-, this half is what JS sends as X-CSRF-TOKEN *@
+    <meta name="csrf-token" content="@csrfTokens.RequestToken" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
     <title>@ViewData["Title"] · MakauTech</title>
     <meta name="description" content="Discover Sibu, Sarawak — Foochow food, Rajang River, jungle escapes. Explore curated places, play mini-games, earn badges." />
     <meta name="theme-color" content="#10b981" />
@@ -35,68 +58,18 @@
     <link rel="stylesheet" href="~/css/games.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/splash.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/responsive.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/security.css" asp-append-version="true" />
+    @* Front-end zero-trust + UX primitives. Loaded early (defer) so MakauSecurity is ready
+       before any inline page script runs, but never blocks parse. *@
+    <script src="~/js/security.js" asp-append-version="true" defer></script>
     @await RenderSectionAsync("Styles", required: false)
 </head>
 <body class="@(ViewBag.IsLoggedIn == true ? "has-sidebar" : "no-sidebar")">
-    @* Antiforgery token rendered globally so AJAX endpoints (game submit, AI chat) can read it. *@
+    @* Antiforgery token rendered globally as a fallback for older inline scripts.
+       Modern callers should read window.MakauSecurity.getCsrfToken() (sourced from <meta>). *@
     @Html.AntiForgeryToken()
 
-    @* Splash / boot screen — once per session, on first visit. *@
-    <div id="mk-splash" role="status" aria-label="Loading MakauTech">
-        <div class="mk-splash-logo"><img src="~/Images/icon.png" alt="" /></div>
-        <div class="mk-splash-brand">
-            <div class="mk-splash-name"><span class="makau">Makau</span><span class="tech">Tech</span></div>
-            <div class="mk-splash-tag">Sibu · Sarawak · Borneo</div>
-        </div>
-        <div class="mk-splash-bar-wrap">
-            <div class="mk-splash-bar-track">
-                <div class="mk-splash-bar-fill" id="mk-splash-fill"></div>
-                <div class="mk-splash-bar-glow"></div>
-            </div>
-            <div class="mk-splash-meta">
-                <span class="label">Loading...</span>
-                <span class="pct" id="mk-splash-pct">0%</span>
-            </div>
-            <div class="mk-splash-tip">Press anywhere to skip</div>
-        </div>
-    </div>
-    <script>
-    (function () {
-        var splash = document.getElementById('mk-splash');
-        if (!splash) return;
-        try {
-            if (sessionStorage.getItem('mk-splash-shown')) {
-                splash.parentNode.removeChild(splash);
-                return;
-            }
-            sessionStorage.setItem('mk-splash-shown', '1');
-        } catch (e) { /* private mode — show splash anyway */ }
-
-        var fill = document.getElementById('mk-splash-fill');
-        var pct  = document.getElementById('mk-splash-pct');
-        var p = 0;
-        var done = false;
-        function close() {
-            if (done) return;
-            done = true;
-            splash.classList.add('is-leaving');
-            setTimeout(function () { if (splash.parentNode) splash.parentNode.removeChild(splash); }, 800);
-        }
-        function tick() {
-            if (done) return;
-            p += 4 + Math.random() * 7;
-            if (p >= 100) { p = 100; }
-            if (fill) fill.style.width = p + '%';
-            if (pct)  pct.textContent  = Math.floor(p) + '%';
-            if (p >= 100) { setTimeout(close, 300); return; }
-            setTimeout(tick, 70 + Math.random() * 60);
-        }
-        tick();
-        splash.addEventListener('click', close);
-        // Hard timeout — never block longer than 4s
-        setTimeout(close, 4000);
-    })();
-    </script>
+    @* Loading bars removed per product direction. *@
 
     <div class="app-shell">
         @if (ViewBag.IsLoggedIn == true)
@@ -111,9 +84,9 @@
             </div>
             <p class="sidebar-tagline">🦢 Gamified Tourism · Sibu, Sarawak</p>
             <nav class="sidebar-nav">
-                <a class="sidebar-link @NavActive("Home", "Index")" asp-controller="Home" asp-action="Index">🏠 Dashboard</a>
-                <a class="sidebar-link @NavActive("Home", "Explore")" asp-controller="Home" asp-action="Explore">📍 Explore places</a>
-                <a class="sidebar-link @NavActive("Home", "Games")" asp-controller="Home" asp-action="Games">🎮 Games hub</a>
+                <a class="sidebar-link @NavActive("Home", "Index")" id="tut-nav-dashboard" asp-controller="Home" asp-action="Index">🏠 Dashboard</a>
+                <a class="sidebar-link @NavActive("Home", "Explore")" id="tut-nav-explore" asp-controller="Home" asp-action="Explore">📍 Explore places</a>
+                <a class="sidebar-link @NavActive("Home", "Games")" id="tut-nav-games" asp-controller="Home" asp-action="Games">🎮 Games hub</a>
                 <a class="sidebar-link @NavActive("Home", "Leaderboard")" asp-controller="Home" asp-action="Leaderboard">🏆 Leaderboard</a>
                 <a class="sidebar-link @NavActive("Home", "Achievements")" asp-controller="Home" asp-action="Achievements">🎖️ Achievements</a>
                 <a class="sidebar-link @NavActive("Home", "Map")" asp-controller="Home" asp-action="Map">🗺️ Live Map</a>
@@ -199,8 +172,25 @@
     </script>
     @await RenderSectionAsync("Scripts", required: false)
 
+    @* Post-login agreement gate removed — users now accept Terms & Privacy
+       directly on the Login/Register form via the in-form checkbox, so a
+       second modal here would be redundant. The mkNeedsAgreement flag is
+       kept (computed in the head block) only as a future safeguard if the
+       Terms version is bumped. *@
+
+    @* Guided tutorial like in-game coachmarks *@
+    @if (mkShouldShowUiTutorial)
+    {
+        @await Html.PartialAsync("_UiTutorial")
+        <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            if (typeof MakauCoachTourStart === 'function') MakauCoachTourStart();
+        });
+        </script>
+    }
+
     <!-- ===== YENKAH AI CHAT WIDGET ===== -->
-    <div id="riva-fab" title="Chat with Yenkah — your Sibu AI guide" aria-label="Open AI assistant">
+    <div id="riva-fab" class="tut-yenkah-fab" title="Chat with Yenkah — your Sibu AI guide" aria-label="Open AI assistant">
         <span id="riva-fab-icon">🦢</span>
         <span id="riva-fab-pulse"></span>
     </div>
@@ -367,6 +357,13 @@
             if (!ttsEnabled && window.speechSynthesis) window.speechSynthesis.cancel();
         });
 
+        function safeHtml(s) {
+            if (window.MakauSecurity && typeof MakauSecurity.escapeHtml === 'function')
+                return MakauSecurity.escapeHtml(s).replace(/\n/g, '<br>');
+            // Fallback: no HTML allowed.
+            return String(s || '').replace(/\n/g, '<br>');
+        }
+
         function addMsg(text, who) {
             const row = document.createElement('div');
             row.className = 'riva-msg riva-msg--' + who;
@@ -375,7 +372,7 @@
             av.textContent = who === 'bot' ? '🦢' : '👤';
             const bubble = document.createElement('div');
             bubble.className = 'riva-msg-bubble';
-            bubble.innerHTML = text;
+            bubble.innerHTML = safeHtml(text);
             if (who === 'bot') { row.appendChild(av); row.appendChild(bubble); }
             else { row.appendChild(bubble); row.appendChild(av); }
             messages.appendChild(row);
@@ -416,16 +413,22 @@
             sendBtn.disabled = true;
             showTyping();
             try {
-                const csrf = document.querySelector('input[name="__RequestVerificationToken"]')?.value || '';
-                const res = await fetch('/api/ai/chat', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrf, 'RequestVerificationToken': csrf },
-                    body: JSON.stringify({ message: text })
-                });
+                const res = (window.MakauSecurity && MakauSecurity.csrfFetch)
+                    ? await MakauSecurity.csrfFetch('/api/ai/chat', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ message: text })
+                    })
+                    : await fetch('/api/ai/chat', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ message: text })
+                    });
                 const data = await res.json();
                 hideTyping();
-                addMsg(data.reply || 'Hmm, something went wrong.', 'bot');
-                speak(data.reply);
+                var reply = (data && data.reply) ? String(data.reply) : 'Hmm, something went wrong.';
+                addMsg(reply, 'bot');
+                speak(reply);
             } catch(e) {
                 hideTyping();
                 addMsg('Sorry, I\'m having trouble connecting. Try again in a moment, lah!', 'bot');
@@ -516,7 +519,7 @@
             type = type || 'info';
             var toast = document.createElement('div');
             toast.className = 'makau-toast makau-toast--' + type;
-            toast.innerHTML = message;
+            toast.textContent = String(message || '');
             var colors = { success: '#10b981', warning: '#f59e0b', info: '#6366f1', error: '#ef4444' };
             toast.style.cssText = 'position:fixed;top:20px;right:20px;z-index:99999;padding:14px 24px;border-radius:12px;color:#fff;font-weight:600;font-size:0.95rem;max-width:380px;box-shadow:0 8px 32px rgba(0,0,0,0.3);animation:makauSlideIn 0.4s ease;background:' + (colors[type] || colors.info) + ';';
             document.body.appendChild(toast);

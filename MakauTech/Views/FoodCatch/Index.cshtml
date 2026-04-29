@@ -27,6 +27,7 @@ body { background: #030d06 !important; }
             <div class="fc-food-legend">
                 <span>🍜 1pt</span><span>🍝 2pt</span><span>🥐 3pt</span><span>🍲 4pt</span><span>🏆 5pt</span><span class="fc-legend-bad">💀 -1 life</span>
             </div>
+            <div class="game-fun-mini" role="note"><b>Fun tip:</b> Move your catcher smoothly — combos feel great when golden 🏆 trophies fall, but one 💀 rotten bite costs a whole life!</div>
             <div class="fc-pay-cost">
                 @if (firstFree)
                 {
@@ -130,7 +131,9 @@ body { background: #030d06 !important; }
     async function payAndStart(errorElId) {
         const errEl = document.getElementById(errorElId);
         errEl.style.display = 'none';
-        const res = await fetch('/FoodCatch/PayToPlay', { method: 'POST' });
+        const res = (window.MakauSecurity && MakauSecurity.csrfFetch)
+            ? await MakauSecurity.csrfFetch('/FoodCatch/PayToPlay', { method: 'POST' })
+            : await fetch('/FoodCatch/PayToPlay', { method: 'POST' });
         const data = await res.json();
         if (!data.success) { errEl.textContent = data.message; errEl.style.display = 'block'; MakauSound.hazard(); return; }
         MakauSound.pay();
@@ -357,7 +360,7 @@ body { background: #030d06 !important; }
         document.getElementById('gameOverScreen').style.display = 'block';
 
         if (score > 0) {
-            fetch('/FoodCatch/SubmitScore', {
+            ((window.MakauSecurity && MakauSecurity.csrfFetch) ? MakauSecurity.csrfFetch : fetch)('/FoodCatch/SubmitScore', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ score: score })

@@ -13,6 +13,13 @@
         public string TravelType { get; set; } = string.Empty;
         public List<string> Interests { get; set; } = new();
 
+        /// <summary>Set true after user finishes or skips the post-login UI walkthrough.</summary>
+        public bool UiTutorialSeen { get; set; } = false;
+
+        // Terms & privacy acceptance (professional agreement gate).
+        public string TermsVersionAccepted { get; set; } = string.Empty;
+        public DateTime? TermsAcceptedAt { get; set; }
+
         // Security fields
         public int FailedLoginAttempts { get; set; } = 0;
         public DateTime? LockedUntil { get; set; }

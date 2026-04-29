@@ -318,6 +318,30 @@
 .cg-submit svg { width:15px;height:15px;transition:transform 0.2s; }
 .cg-submit:hover svg { transform:translateX(4px); }
 
+/* ── Agreement checkbox ── */
+.cg-agree-row {
+    margin-bottom: 20px;
+    background: rgba(52,211,153,0.05);
+    border: 1px solid rgba(52,211,153,0.18);
+    border-radius: 10px;
+    padding: 13px 14px;
+}
+.cg-agree-label {
+    display: flex; align-items: flex-start; gap: 10px; cursor: pointer;
+}
+.cg-agree-check {
+    width: 15px; height: 15px; accent-color: #34d399;
+    flex-shrink: 0; margin-top: 2px; cursor: pointer;
+}
+.cg-agree-label span {
+    font-size: 12px; color: rgba(255,255,255,0.52); line-height: 1.55;
+}
+.cg-agree-link {
+    color: #34d399; font-weight: 700; text-decoration: none;
+}
+.cg-agree-link:hover { text-decoration: underline; }
+.cg-submit:disabled { opacity: 0.55; cursor: not-allowed; }
+
 /* register link */
 .cg-register {
     margin-top: 18px;
@@ -525,35 +549,64 @@
                 </div>
             }
 
-            <form method="post" asp-action="Login" novalidate>
+            @* Login form — server-rendered, progressively enhanced.
+               Works without JS (server still validates LoginViewModel + checks BCrypt
+               + enforces antiforgery via AutoValidateAntiforgeryTokenAttribute).
+               JS layers on:
+                 (a) MkSchema validation BEFORE network hit
+                 (b) Button lock against double-submission
+                 (c) Slim top progress bar during the auth handoff
+               Antiforgery token is emitted by the asp-action tag helper as a
+               hidden __RequestVerificationToken — no manual @Html.AntiForgeryToken() needed. *@
+            <form id="loginForm" method="post" asp-action="Login" novalidate>
+                @* Explicit antiforgery token. The <form asp-action> tag helper emits one automatically
+                   too, but stating it inline makes the security contract obvious to reviewers. *@
                 @Html.AntiForgeryToken()
 
                 <div class="cg-field">
                     <label class="cg-field-label" for="loginEmail">Email address</label>
                     <div class="cg-field-wrap">
                         <input id="loginEmail" class="cg-input" type="email" name="Email"
-                               placeholder="you@example.com" autocomplete="email" required />
+                               placeholder="you@example.com" autocomplete="email"
+                               maxlength="256" required
+                               aria-describedby="loginEmailErr" />
                         <svg class="cg-field-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"/>
                         </svg>
                         <div class="cg-field-line"></div>
                     </div>
+                    <div id="loginEmailErr" class="mk-fielderror" role="alert" aria-live="polite"></div>
                 </div>
 
                 <div class="cg-field">
                     <label class="cg-field-label" for="loginPassword">Password</label>
                     <div class="cg-field-wrap">
                         <input id="loginPassword" class="cg-input" type="password" name="Password"
-                               placeholder="••••••••" autocomplete="current-password" required />
+                               placeholder="••••••••" autocomplete="current-password"
+                               minlength="6" maxlength="128" required
+                               aria-describedby="loginPasswordErr" />
                         <svg class="cg-field-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"/>
                         </svg>
                         <div class="cg-field-line"></div>
                     </div>
+                    <div id="loginPasswordErr" class="mk-fielderror" role="alert" aria-live="polite"></div>
                 </div>
 
-                <button type="submit" class="cg-submit">
-                    Enter Sibu
+                <!-- Agreement — must tick before entering -->
+                <div class="cg-agree-row">
+                    <label class="cg-agree-label" for="loginAgree">
+                        <input type="checkbox" id="loginAgree" class="cg-agree-check" />
+                        <span>I have read and agree to the
+                            <a href="@Url.Action("Terms","Home")" target="_blank" rel="noopener" class="cg-agree-link">Terms of Service</a>
+                            &amp;
+                            <a href="@Url.Action("Privacy","Home")" target="_blank" rel="noopener" class="cg-agree-link">Privacy Policy</a>
+                        </span>
+                    </label>
+                </div>
+
+                <button type="submit" id="loginSubmit" class="cg-submit" disabled>
+                    <span>Enter Sibu</span>
                     <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/>
                     </svg>
@@ -564,6 +617,12 @@
                 New to Sibu? <a asp-action="Register">Create your account →</a>
             </div>
 
+            <div class="cg-register" style="margin-top:10px;">
+                <a href="javascript:void(0)" onclick="window.MakauLegalPreviewOpen && MakauLegalPreviewOpen()" style="color:rgba(255,255,255,0.55);font-weight:700;text-decoration:none;">
+                    Read Terms & Privacy before signing in
+                </a>
+            </div>
+
         </div>
     </div>
 
@@ -571,7 +630,20 @@
 </div>
 
 @section Scripts {
+@await Html.PartialAsync("_AgreementPreview")
 <script>
+/* ── Agreement gate — unlock submit when checkbox ticked ── */
+(function () {
+    var chk = document.getElementById('loginAgree');
+    var btn = document.getElementById('loginSubmit');
+    if (!chk || !btn) return;
+    function sync() {
+        btn.disabled = !chk.checked;
+    }
+    chk.addEventListener('change', sync);
+    sync();
+}());
+
 /* ══════════════════════════════════════════════════════════════════
    MakauTech Login — Professional parallax engine
    One rAF loop drives BOTH the slow breathing scale AND the
@@ -612,6 +684,87 @@
         mx = e.clientX / window.innerWidth;
         my = e.clientY / window.innerHeight;
     }, { passive: true });
+}());
+
+/* ══════════════════════════════════════════════════════════════════
+   MakauTech Login — secure submit pipeline
+   1. MkSchema validation (Zod-style) BEFORE network — defence in depth.
+   2. Button lock prevents double-submit (no duplicate POST, no extra
+      lockout counter increments on the server).
+   3. Slim top progress bar fires during the auth handoff for instant
+      perceived feedback. The page then completes a normal POST so the
+      antiforgery cookie/header pair is validated server-side.
+   ══════════════════════════════════════════════════════════════════ */
+(function () {
+    'use strict';
+    if (!window.MakauSecurity) return; // graceful degrade — server still validates
+
+    var MK = window.MakauSecurity;
+    var form  = document.getElementById('loginForm');
+    var btn   = document.getElementById('loginSubmit');
+    var email = document.getElementById('loginEmail');
+    var pwd   = document.getElementById('loginPassword');
+    var emailErr = document.getElementById('loginEmailErr');
+    var pwdErr   = document.getElementById('loginPasswordErr');
+    if (!form || !btn) return;
+
+    // Schema mirrors the server-side LoginViewModel data annotations exactly.
+    var loginSchema = MK.MkSchema.object({
+        Email: MK.MkSchema.string()
+            .required('Email is required.')
+            .email('Enter a valid email address.')
+            .max(256, 'Email is too long.'),
+        Password: MK.MkSchema.string()
+            .required('Password is required.')
+            .min(6, 'Password must be at least 6 characters.')
+            .max(128, 'Password is too long.')
+    });
+
+    function showError(input, errEl, msg) {
+        if (msg) {
+            errEl.textContent = msg;            // textContent => no HTML injection
+            errEl.setAttribute('data-visible', 'true');
+            input.setAttribute('data-mk-invalid', 'true');
+            input.setAttribute('aria-invalid', 'true');
+        } else {
+            errEl.textContent = '';
+            errEl.removeAttribute('data-visible');
+            input.removeAttribute('data-mk-invalid');
+            input.removeAttribute('aria-invalid');
+        }
+    }
+
+    // Live clear on input — feedback without nagging.
+    email.addEventListener('input', function () { showError(email, emailErr, ''); });
+    pwd  .addEventListener('input', function () { showError(pwd,   pwdErr,   ''); });
+
+    form.addEventListener('submit', function (e) {
+        // Already submitting? Hard-block the second click.
+        if (btn.getAttribute('data-loading') === 'true') {
+            e.preventDefault();
+            return;
+        }
+
+        var result = loginSchema.safeParse({
+            Email:    email.value,
+            Password: pwd.value
+        });
+
+        if (!result.ok) {
+            e.preventDefault();
+            showError(email, emailErr, result.errors.Email || '');
+            showError(pwd,   pwdErr,   result.errors.Password || '');
+            // Focus the first invalid field for keyboard users.
+            (result.errors.Email ? email : pwd).focus();
+            return;
+        }
+
+        // Passed client-side schema → lock UI + show slim top bar.
+        btn.setAttribute('data-loading', 'true');
+        btn.setAttribute('aria-busy', 'true');
+        // Server takes over from here. On error, the page reloads and
+        // UI unlocks on next render.
+    });
 }());
 </script>
 }
